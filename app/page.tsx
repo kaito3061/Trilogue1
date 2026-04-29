@@ -55,8 +55,12 @@ export default function Home() {
       setMessages((prev) => [...prev, data.reply]);
     } catch (error) {
       console.error("Failed to send message:", error);
-      setErrorMessage("エラーが発生しました。時間を置いて再度お試しください。");
-      alert("エラーが発生しました");
+      const message =
+        error instanceof Error
+          ? error.message
+          : "エラーが発生しました。時間を置いて再度お試しください。";
+      setErrorMessage(message);
+      alert(message);
     } finally {
       setIsLoading(false);
     }

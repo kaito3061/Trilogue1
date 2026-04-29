@@ -1,30 +1,24 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import OpenAI from "openai";
 import { NextResponse } from "next/server";
 import { ApiError, ChatRequest, ChatResponse, Message } from "@/types/chat";
 
-type GeminiRole = "user" | "model";
-
-interface GeminiContent {
-  role: GeminiRole;
-  parts: Array<{ text: string }>;
-}
-
 const SYSTEM_INSTRUCTION =
   "あなたはシステム上の最初のエージェント『Alpha（アルファ）』です。親切で簡潔に対話を行ってください。";
-
-const toGeminiContents = (messages: Message[]): GeminiContent[] =>
-  messages.map((message) => ({
-    role: message.role === "assistant" ? "model" : "user",
-    parts: [{ text: message.content }],
-  }));
+const OPENAI_MODEL = process.env.OPENAI_MODEL ?? "gpt-4o-mini";
 
 const jsonError = (status: number, code: ApiError["code"], message: string) =>
   NextResponse.json<ApiError>({ code, message }, { status });
 
+const toOpenAIMessages = (messages: Message[]) =>
+  messages.map((message) => ({
+    role: message.role,
+    content: message.content,
+  })) as Array<{ role: "user" | "assistant"; content: string }>;
+
 export async function POST(request: Request) {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
-    return jsonError(500, "INTERNAL_ERROR", "GEMINI_API_KEY が設定されていません。");
+    return jsonError(500, "INTERNAL_ERROR", "OPENAI_API_KEY が設定されていません。");
   }
 
   try {
@@ -47,18 +41,18 @@ export async function POST(request: Request) {
       return jsonError(400, "INVALID_REQUEST", "messages の形式が不正です。");
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
-      systemInstruction: SYSTEM_INSTRUCTION,
+    const client = new OpenAI({ apiKey });
+    const completion = await client.chat.completions.create({
+      model: OPENAI_MODEL,
+      messages: [
+        { role: "system", content: SYSTEM_INSTRUCTION },
+        ...toOpenAIMessages(messages),
+      ],
     });
-
-    const contents = toGeminiContents(messages);
-    const result = await model.generateContent({ contents });
-    const text = result.response.text().trim();
+    const text = completion.choices[0]?.message?.content?.trim();
 
     if (!text) {
-      return jsonError(502, "UPSTREAM_ERROR", "AI応答が空でした。");
+      return jsonError(502, "UPSTREAM_ERROR", "OpenAI API の応答が空でした。");
     }
 
     const response: ChatResponse = {
@@ -72,7 +66,11 @@ export async function POST(request: Request) {
 
     return NextResponse.json<ChatResponse>(response);
   } catch (error) {
-    console.error("Gemini API error:", error);
-    return jsonError(502, "UPSTREAM_ERROR", "Gemini API の呼び出しに失敗しました。");
+    console.error("OpenAI API error:", error);
+    const status = (error as { status?: number })?.status;
+    if (status === 429) {
+      return jsonError(429, "RATE_LIMIT", "OpenAI API の利用上限に達しました。時間を置いて再試行してください。");
+    }
+    return jsonError(502, "UPSTREAM_ERROR", "OpenAI API の呼び出しに失敗しました。");
   }
 }
