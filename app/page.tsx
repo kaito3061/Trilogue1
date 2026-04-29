@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { Bot, Send, User } from "lucide-react";
-import { Message } from "@/types/chat";
+import { ApiError, ChatResponse, Message } from "@/types/chat";
 
 const makeMessage = (role: Message["role"], content: string): Message => ({
   id: crypto.randomUUID(),
@@ -15,13 +15,14 @@ export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const endRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const trimmed = input.trim();
@@ -30,15 +31,35 @@ export default function Home() {
     }
 
     const userMessage = makeMessage("user", trimmed);
-    setMessages((prev) => [...prev, userMessage]);
+    const nextMessages = [...messages, userMessage];
+    setMessages(nextMessages);
     setInput("");
     setIsLoading(true);
+    setErrorMessage(null);
 
-    setTimeout(() => {
-      const assistantMessage = makeMessage("assistant", "これはテストの返答です");
-      setMessages((prev) => [...prev, assistantMessage]);
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ messages: nextMessages }),
+      });
+
+      if (!response.ok) {
+        const errorData = (await response.json()) as ApiError;
+        throw new Error(errorData.message || "APIエラーが発生しました。");
+      }
+
+      const data = (await response.json()) as ChatResponse;
+      setMessages((prev) => [...prev, data.reply]);
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      setErrorMessage("エラーが発生しました。時間を置いて再度お試しください。");
+      alert("エラーが発生しました");
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
   };
 
   return (
@@ -127,6 +148,8 @@ export default function Home() {
             送信
           </button>
         </form>
+
+        {errorMessage && <p className="mt-2 text-sm text-rose-400">{errorMessage}</p>}
       </section>
     </main>
   );
