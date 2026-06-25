@@ -1,26 +1,18 @@
-import OpenAI from "openai";
 import { NextResponse } from "next/server";
 import { ApiError, ChatRequest, ChatResponse, Message } from "@/types/chat";
-
-const SYSTEM_INSTRUCTION =
-  "あなたはシステム上の最初のエージェント『Alpha（アルファ）』です。親切で簡潔に対話を行ってください。";
-const OPENAI_MODEL = process.env.OPENAI_MODEL ?? "gpt-4o-mini";
+import { getAgent } from "@/lib/agents";
+import { generateReply, LlmError, LlmTurn } from "@/lib/llm";
 
 const jsonError = (status: number, code: ApiError["code"], message: string) =>
   NextResponse.json<ApiError>({ code, message }, { status });
 
-const toOpenAIMessages = (messages: Message[]) =>
+const toTurns = (messages: Message[]): LlmTurn[] =>
   messages.map((message) => ({
     role: message.role,
     content: message.content,
-  })) as Array<{ role: "user" | "assistant"; content: string }>;
+  }));
 
 export async function POST(request: Request) {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    return jsonError(500, "INTERNAL_ERROR", "OPENAI_API_KEY が設定されていません。");
-  }
-
   try {
     const body = (await request.json()) as Partial<ChatRequest>;
     const messages = body.messages;
@@ -41,36 +33,28 @@ export async function POST(request: Request) {
       return jsonError(400, "INVALID_REQUEST", "messages の形式が不正です。");
     }
 
-    const client = new OpenAI({ apiKey });
-    const completion = await client.chat.completions.create({
-      model: OPENAI_MODEL,
-      messages: [
-        { role: "system", content: SYSTEM_INSTRUCTION },
-        ...toOpenAIMessages(messages),
-      ],
+    const agent = getAgent(body.agentId);
+    const result = await generateReply({
+      systemInstruction: agent.systemInstruction,
+      model: agent.model,
+      history: toTurns(messages),
     });
-    const text = completion.choices[0]?.message?.content?.trim();
-
-    if (!text) {
-      return jsonError(502, "UPSTREAM_ERROR", "OpenAI API の応答が空でした。");
-    }
 
     const response: ChatResponse = {
       reply: {
         id: crypto.randomUUID(),
         role: "assistant",
-        content: text,
+        content: result.text,
         createdAt: new Date().toISOString(),
       },
     };
 
     return NextResponse.json<ChatResponse>(response);
   } catch (error) {
-    console.error("OpenAI API error:", error);
-    const status = (error as { status?: number })?.status;
-    if (status === 429) {
-      return jsonError(429, "RATE_LIMIT", "OpenAI API の利用上限に達しました。時間を置いて再試行してください。");
+    if (error instanceof LlmError) {
+      return jsonError(error.status, error.code, error.message);
     }
-    return jsonError(502, "UPSTREAM_ERROR", "OpenAI API の呼び出しに失敗しました。");
+    console.error("Unexpected /api/chat error:", error);
+    return jsonError(500, "INTERNAL_ERROR", "サーバー内部エラーが発生しました。");
   }
 }
