@@ -33,15 +33,22 @@ npm install
 ```
 
 ### ② APIキーの設定
-プロジェクト直下に `.env.local` を作成し、以下を記入（このファイルはGit管理外）:
+テンプレート `.env.local.example` をコピーして `.env.local` を作り、自分のキーを記入する:
 
+```bash
+cp .env.local.example .env.local
+# 作成した .env.local を開き、OPENAI_API_KEY= に自分のキーを設定
+```
+
+`.env.local` の中身:
 ```bash
 OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxx
 # 任意: モデルを変えたい場合
-# OPENAI_MODEL=gpt-4o-mini
+OPENAI_MODEL=gpt-4o-mini
 ```
 
-> ⚠ APIキーは秘密情報。`.env.local` を共有・コミットしないこと（`.gitignore` 済み）。
+> ⚠ **キーは各自の `.env.local` に置くこと。共有物（リポジトリ・ドキュメント・チャット等）に実キーを絶対に入れない。**
+> `.env.local` は `.gitignore` 済みで追跡されない。リポジトリに含めてよいのはプレースホルダのみの `.env.local.example` のみ。
 
 ---
 
