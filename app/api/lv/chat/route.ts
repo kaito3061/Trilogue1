@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { LvChatRequest, LvChatResponse, Role } from "@/types/chat";
 import { getAgent } from "@/lib/agents";
 import { generateReply, LlmError, LlmTurn } from "@/lib/llm";
+import { MAX_TEXT_LENGTH, trimHistory } from "@/lib/limits";
 
 // LabVIEW 向けエンドポイント。
 // 方針: HTTP ステータスは常に 200 を返し、成否は body.ok で判定させる。
@@ -37,15 +38,27 @@ export async function POST(request: Request) {
       });
     }
 
+    if (text.length > MAX_TEXT_LENGTH) {
+      return reply({
+        ok: false,
+        reply: "",
+        agentId: agent.id,
+        agentName: agent.name,
+        model: agent.model,
+        error: `text が長すぎます（最大 ${MAX_TEXT_LENGTH} 文字）。`,
+      });
+    }
+
     const history: LlmTurn[] = Array.isArray(body.history)
       ? body.history.filter(isTurn).map((turn) => ({ role: turn.role, content: turn.content }))
       : [];
     history.push({ role: "user", content: text });
+    const trimmedHistory = trimHistory(history);
 
     const result = await generateReply({
       systemInstruction: agent.systemInstruction,
       model: agent.model,
-      history,
+      history: trimmedHistory,
     });
 
     return reply({

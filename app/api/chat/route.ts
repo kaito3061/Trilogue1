@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { ApiError, ChatRequest, ChatResponse, Message } from "@/types/chat";
 import { getAgent } from "@/lib/agents";
 import { generateReply, LlmError, LlmTurn } from "@/lib/llm";
+import { MAX_TEXT_LENGTH, trimHistory } from "@/lib/limits";
 
 const jsonError = (status: number, code: ApiError["code"], message: string) =>
   NextResponse.json<ApiError>({ code, message }, { status });
@@ -33,11 +34,20 @@ export async function POST(request: Request) {
       return jsonError(400, "INVALID_REQUEST", "messages の形式が不正です。");
     }
 
+    const tooLong = messages.some((message) => message.content.length > MAX_TEXT_LENGTH);
+    if (tooLong) {
+      return jsonError(
+        400,
+        "INVALID_REQUEST",
+        `メッセージが長すぎます（1件あたり最大 ${MAX_TEXT_LENGTH} 文字）。`,
+      );
+    }
+
     const agent = getAgent(body.agentId);
     const result = await generateReply({
       systemInstruction: agent.systemInstruction,
       model: agent.model,
-      history: toTurns(messages),
+      history: trimHistory(toTurns(messages)),
     });
 
     const response: ChatResponse = {
