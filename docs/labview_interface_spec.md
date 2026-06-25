@@ -179,7 +179,7 @@ curl -X POST http://localhost:3000/api/lv/chat \
 - [x] LV が組み立てやすい平坦JSONエンドポイント `/api/lv/chat` を公開
 - [x] `agentId` でAIを切り替え可能（マルチエージェントの足場）
 - [x] エージェント一覧 `/api/lv/agents` を公開
-- [ ] LV 側で `Trilogue Chat.vi` を作成し、文字列往復を確認 ← **次はここ**
+- [x] LV 側で `Trilogue Chat.vi` を作成し、文字列往復を確認（別PC間・実機で達成済み）
 
 ---
 

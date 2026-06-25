@@ -146,12 +146,17 @@ LabVIEW を開きながら**上から順になぞれば** `Trilogue Chat.vi` が
 
 ## STEP 9. SubVI 化（再利用のため）
 
-1. フロントパネル右上の**コネクタペーン**を右クリック → `Patterns` で端子数を選択。
-2. 端子に割り当て:
+> 注意: コネクタペーンは**フロントパネル側**にしかない。ブロックダイアグラム右上のアイコンを
+> 右クリックしても `Show Connector` は出ない（`VI Properties` 等のみ）。必ず `Ctrl+E` でフロントパネルへ。
+
+1. **フロントパネルに切り替える**（`Ctrl+E`）。
+2. フロントパネル右上の**アイコン**を右クリック → **`Show Connector`** を選ぶ → 格子状のコネクタペーンに変わる。
+3. コネクタペーン（格子）を右クリック → `Patterns` で端子数（入出力8個なので 4-4 など）を選択。
+4. 端子に割り当て（マスをクリック → 対応するコントロール/表示器をクリック）:
    - 入力: `Base URL`, `User Text`, `Agent ID`, `error in`
    - 出力: `Reply`, `OK?`, `Error Msg`, `error out`
-3. アイコンを編集して保存名 `Trilogue Chat.vi`。
-4. 以後は上位VIから `User Text` と `Agent ID` を渡すだけで AI と往復できる。
+5. アイコンを編集して保存名 `Trilogue Chat.vi`。
+6. 以後は上位VIから `User Text` と `Agent ID` を渡すだけで AI と往復できる。
 
 ---
 
