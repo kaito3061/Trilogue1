@@ -23,7 +23,10 @@ Phase 1（MVP）では、その土台として **ユーザー1名** と **単一
 - Frontend: Next.js（App Router）, React, Tailwind CSS, lucide-react
 - Backend: Next.js API Routes（Route Handlers）
 - Language: TypeScript
-- AI API: Gemini API（`@google/generative-ai`）, モデル: `gemini-1.5-flash`（無料枠想定）
+- AI API: OpenAI API（`openai` SDK）, モデル: `gpt-4o-mini`（環境変数 `OPENAI_MODEL` で変更可）
+
+### 1.5 技術選定の変更履歴
+- Phase 1 当初は Gemini API（`gemini-1.5-flash`）を想定していたが、APIクォータ（利用制限）問題により OpenAI API（`gpt-4o-mini`）へ変更した。
 
 ---
 
@@ -40,8 +43,8 @@ Phase 1（MVP）では、その土台として **ユーザー1名** と **単一
   - レスポンス待機時のローディング表示・自動スクロール
 - サーバー（Backend / Route Handlers）
   - API入力のバリデーション
-  - 会話履歴のGeminiフォーマット変換
-  - Gemini API呼び出し
+  - 会話履歴のOpenAI Chat Completions形式への変換
+  - OpenAI API呼び出し
   - 応答テキストの整形・返却
 
 ### 2.2 主要コンポーネント（論理）
@@ -50,13 +53,13 @@ Phase 1（MVP）では、その土台として **ユーザー1名** と **単一
 - `MessageInput`（送信フォーム）
 - `useChat`（会話状態を扱うカスタムフック）
 - `POST /api/chat`（AI応答取得API）
-- `GeminiClient`（Gemini呼び出しラッパ）
+- `OpenAIClient`（OpenAI呼び出しラッパ）
 - `PromptBuilder`（System Instructionおよび履歴整形）
 
 ### 2.3 データフロー
 1. ユーザーが入力し送信
 2. フロントエンドが `Message` を state に追加し、`/api/chat` にPOST
-3. バックエンドが会話履歴をGemini形式へ変換し、System Instruction付きで `gemini-1.5-flash` を呼び出し
+3. バックエンドが会話履歴をOpenAI Chat Completions形式へ変換し、System Instruction付きで `gpt-4o-mini` を呼び出し
 4. 受信したAI応答をフロントへ返却
 5. フロントエンドがAIメッセージを state に反映し、画面更新・自動スクロール
 
@@ -86,9 +89,9 @@ Phase 1（MVP）では、その土台として **ユーザー1名** と **単一
 
 ### 3.2 バックエンド要件
 
-#### FR-BE-01: Gemini API呼び出し
-- Route Handler（例: `POST /api/chat`）でGemini APIを呼び出すこと
-- `@google/generative-ai` を利用し、`gemini-1.5-flash` を使用すること
+#### FR-BE-01: OpenAI API呼び出し
+- Route Handler（例: `POST /api/chat`）でOpenAI APIを呼び出すこと
+- `openai` SDK を利用し、`gpt-4o-mini` を使用すること
 - APIキーは環境変数管理し、クライアントへ露出しないこと
 
 #### FR-BE-02: System Instructionによるキャラクター設定
@@ -96,7 +99,7 @@ Phase 1（MVP）では、その土台として **ユーザー1名** と **単一
 - System Instructionは将来的なキャラクター追加を見据え、差し替え可能な設計にすること
 
 #### FR-BE-03: エラーハンドリング
-- Gemini APIエラー時に、クライアントが扱える標準エラーフォーマットを返すこと
+- OpenAI APIエラー時に、クライアントが扱える標準エラーフォーマットを返すこと
 - タイムアウト/レート制限/不正入力を識別可能なステータスコードで返却すること
 
 ### 3.3 状態管理要件（会話履歴とコンテキスト）
@@ -106,8 +109,8 @@ Phase 1（MVP）では、その土台として **ユーザー1名** と **単一
 - 履歴は `Message[]` として一貫した型で管理すること
 
 #### FR-ST-02: 履歴フォーマット変換
-- `Message[]` をGemini APIが要求する履歴形式（role/parts）に変換すること
-- roleマッピング（例: `user` -> `user`, `assistant` -> `model`）を明示的に実装すること
+- `Message[]` をOpenAI Chat Completions が要求する履歴形式（role/content）に変換すること
+- roleマッピング（`user` -> `user`, `assistant` -> `assistant`）を明示的に実装すること
 
 #### FR-ST-03: コンテキスト引き渡し
 - 毎リクエストで必要な会話履歴をバックエンドへ渡し、文脈を維持すること
@@ -134,11 +137,11 @@ Phase 1（MVP）では、その土台として **ユーザー1名** と **単一
 - `any` の使用を禁止し、ユニオン型/リテラル型で送信者種別・状態を表現すること
 
 #### NFR-TS-02: 型に基づく安全な変換
-- フロント内部型とGeminiリクエスト型の変換関数を明示し、型で変換漏れを防ぐこと
+- フロント内部型とOpenAIリクエスト型の変換関数を明示し、型で変換漏れを防ぐこと
 - 不正なroleや空contentはコンパイル時・実行時の双方で検知できるようにすること
 
 ### 4.3 保守性・運用性
-- 環境変数（例: `GEMINI_API_KEY`）の管理を明確化すること
+- 環境変数（例: `OPENAI_API_KEY`）の管理を明確化すること
 - ログは開発時デバッグに必要十分な粒度で出力し、機密情報を含めないこと
 - コンポーネント/関数はテストしやすい粒度で分割すること
 
@@ -163,7 +166,7 @@ Phase 1（MVP）では、その土台として **ユーザー1名** と **単一
 ### Phase 4: プラットフォーム化
 - セッション永続化、履歴検索、再開機能
 - 複数ユーザー対応、権限管理、監査ログ
-- モデル切替（Gemini以外を含む）に向けた抽象化レイヤー整備
+- モデル切替（OpenAI以外を含む）に向けた抽象化レイヤー整備
 
 ---
 
