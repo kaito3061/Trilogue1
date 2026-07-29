@@ -32,30 +32,7 @@
 > *（技術的に言うと）* LabVIEW を HTTP クライアント、Docker 上の自作APIサーバーを LLM ブリッジとし、
 > 外部LLMへ HTTPS で中継する構成。1対1の往復が動作済み。
 
-```mermaid
-flowchart LR
-    subgraph Client["クライアント（研究室PC / Windows・Mac）"]
-        LV["LabVIEW VI<br/>文字列入出力 / センサー・制御系"]
-    end
-
-    subgraph Docker["Docker コンテナ（どのPCでも同一環境）"]
-        subgraph Server["自作APIサーバー（Next.js / Node.js）"]
-            EP["HTTPエンドポイント<br/>/api/lv/chat, /api/lv/agents"]
-            ROUTE["エージェント振り分け<br/>agentId → ペルソナ・モデル選択"]
-            LLMLIB["LLM呼び出し共通部品<br/>(プロバイダ抽象)"]
-        end
-    end
-
-    subgraph Cloud["LLMプロバイダ（外部API）"]
-        LLM["OpenAI / Gemini 等"]
-    end
-
-    LV -- "HTTP POST (JSON, UTF-8)" --> EP
-    EP --> ROUTE --> LLMLIB
-    LLMLIB -- "HTTPS (REST)" --> LLM
-    LLM -- "応答" --> LLMLIB --> EP
-    EP -- "HTTP応答 (JSON)" --> LV
-```
+![diagram](./system_architecture-1.png)
 
 **現状のポイント**
 - LabVIEW ⇄ サーバー：**HTTP / JSON**（同一PCでも別PC=同一LANでも可）
@@ -87,37 +64,7 @@ flowchart LR
 > *（技術的に言うと）* 患者の発話とセンサーデータを入力に、**ファシリテーター（司会）AI** が会話を制御し、
 > **差し替え可能なペルソナを持つ複数の専門AI** に振り分け、応答を集約して評価につなげる。
 
-```mermaid
-flowchart TB
-    subgraph Input["入力（LabVIEW経由）"]
-        PT["患者の発話<br/>(トレーニング後の感想など)"]
-        SENS["センサーデータ<br/>(屈曲角・運動回数・脈波 等)"]
-    end
-
-    subgraph ServerTB["自作APIサーバー（Docker / Node.js）"]
-        FAC["ファシリテーターAI（司会・ルーター）<br/>文脈に応じ次の発話者を判断・会話フロー制御"]
-        subgraph Agents["専門AI群（ペルソナは動的に差し替え可能）"]
-            P1["専門AI #1<br/>(ペルソナ A)"]
-            P2["専門AI #2<br/>(ペルソナ B)"]
-            P3["専門AI #N<br/>(ペルソナ …)"]
-        end
-        AGG["応答の集約・比較<br/>(複数AIを競合させ統合見解を生成)"]
-    end
-
-    EVAL["評価・解析結果<br/>(状態評価 / 学習用データ蓄積)"]
-
-    PT --> FAC
-    SENS -. 定量データとして併用 .-> AGG
-    FAC -->|指名/順序制御| P1
-    FAC -->|指名/順序制御| P2
-    FAC -->|指名/順序制御| P3
-    P1 --> AGG
-    P2 --> AGG
-    P3 --> AGG
-    AGG --> FAC
-    AGG --> EVAL
-    EVAL -. LabVIEWへ返却・表示 .-> PT
-```
+![diagram](./system_architecture-2.png)
 
 ### To-Be の要件（今回のミーティングで合意）
 - **ファシリテーター（司会）AIの導入**：入力・文脈に応じ、どの専門AIに回答させるかを判断・制御する**ルーター**。
@@ -171,14 +118,7 @@ flowchart TB
 > 📌 **要するに**：**「まず①1対1で会話 → ②複数AIの“会議”化 → ③センサーの数値も混ぜて自動評価」** の順に育てます。
 > 今は①が完成、次に②へ進む段階です。将来は数値と会話を合わせた自動評価まで発展させます。
 
-```mermaid
-timeline
-    title Trilogue 発展ロードマップ
-    現在 : LLM×LabVIEWのJSON接続基盤(Docker化済) : 単一AI往復を実機確認
-    次段階 : サーバー側オーケストレーション : ファシリテーターAI＋複数ペルソナの会話制御
-    中期 : センサーデータ×会話の統合評価 : リハ時系列データの自動・定量評価
-    長期 : 偏らないマルチエージェント評価空間 : 高齢者・小児リハへの応用と学習データ蓄積
-```
+![diagram](./system_architecture-3.png)
 
 ---
 
