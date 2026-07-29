@@ -164,6 +164,10 @@ Web UI 用の `/api/chat`（入れ子の `messages[]` を要求）とは別に�
 | `error` | エラー文言（成功時は空文字） |
 
 #### LabVIEW 側の実装を増やさないための設計
+
+> 組み立て手順は `docs/labview_multi_build_guide.md`（既存の `Trilogue Chat.vi` を
+> 複製して改造する形式）に、クリック単位でまとめてある。
+
 - **既存VIの流用**：`ok` と `transcript` の2つだけ見れば会話が表示できる。
   `Unflatten From JSON` のサンプル型を `{ok, transcript, count, error}` のクラスタにすれば、
   配列を解析せずに済む（`turns` は無視しても壊れない）。
