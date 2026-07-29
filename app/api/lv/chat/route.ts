@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { LvChatRequest, LvChatResponse, Role } from "@/types/chat";
+import { LvChatRequest, LvChatResponse } from "@/types/chat";
 import { getAgent } from "@/lib/agents";
+import { parseHistory } from "@/lib/history";
 import { generateReply, LlmError, LlmTurn } from "@/lib/llm";
 import { MAX_TEXT_LENGTH, trimHistory } from "@/lib/limits";
 
@@ -10,16 +11,6 @@ import { MAX_TEXT_LENGTH, trimHistory } from "@/lib/limits";
 // 「平坦JSON + ok フラグ」に寄せることで SubVI 側の実装を最小化する。
 
 const reply = (data: LvChatResponse) => NextResponse.json<LvChatResponse>(data);
-
-const isTurn = (value: unknown): value is { role: Role; content: string } => {
-  if (!value || typeof value !== "object") return false;
-  const turn = value as { role?: unknown; content?: unknown };
-  return (
-    (turn.role === "user" || turn.role === "assistant") &&
-    typeof turn.content === "string" &&
-    turn.content.trim().length > 0
-  );
-};
 
 export async function POST(request: Request) {
   try {
@@ -49,9 +40,7 @@ export async function POST(request: Request) {
       });
     }
 
-    const history: LlmTurn[] = Array.isArray(body.history)
-      ? body.history.filter(isTurn).map((turn) => ({ role: turn.role, content: turn.content }))
-      : [];
+    const history: LlmTurn[] = parseHistory(body.history);
     history.push({ role: "user", content: text });
     const trimmedHistory = trimHistory(history);
 

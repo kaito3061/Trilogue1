@@ -30,6 +30,10 @@ DLL 化は当面行わず、LV 標準の **HTTP Client VIs** だけで完結さ�
 3. サーバーが OpenAI へリクエスト。
 4. 返信を平坦JSONに整形して LV へ返却。
 
+複数AIをまとめて呼ぶ `/api/lv/multi`（段階B）では、上記 2〜3 を
+**サーバーが発言順に沿って必要な回数だけ繰り返し**、結果をまとめて 4 で返す。
+LV から見た往復は変わらず1回。
+
 ---
 
 ## 2. LabVIEW 専用エンドポイント
@@ -97,7 +101,77 @@ Web UI 用の `/api/chat`（入れ子の `messages[]` を要求）とは別に�
 | `model` | 実際に使用したモデル名 |
 | `error` | エラー文言（成功時は空文字） |
 
-### 2.2 `GET /api/lv/agents` — エージェント一覧 / 疎通確認
+### 2.2 `POST /api/lv/multi` — 複数AIの一括応答（段階B）
+
+> 1リクエストで**複数のAIに順番に発言させ、まとめて返す**エンドポイント。
+> 「誰が何番目に話すか」の制御は**サーバー側**が持つため、LV は1回投げるだけでよい。
+> こちらも HTTP ステータスは**常に 200**、成否は `ok` で判定する。
+
+各AIには**直前までの発言が文脈として渡る**ため、単発の並列回答ではなく
+互いの発言を読み合う会話になる（会話ログ上では発言者を `【名前】` で区別）。
+
+#### リクエスト（最小）
+```json
+{ "text": "トレーニングを終えました。指が動きやすくなった気がします。" }
+```
+`agentIds` 省略時は**登録済みの全エージェント**が1巡発言する。
+
+#### リクエスト（フル）
+```json
+{
+  "text": "トレーニングを終えました",
+  "agentIds": ["alpha", "beta"],
+  "rounds": 2,
+  "history": [
+    { "role": "user", "content": "前回は少し痛みがありました" },
+    { "role": "assistant", "content": "無理のない範囲で進めましょう" }
+  ]
+}
+```
+
+| フィールド | 必須 | 説明 |
+| --- | --- | --- |
+| `text` | ✅ | ユーザー（患者）の発話 |
+| `agentIds` | 任意 | 発言させる順番。省略時は全エージェント。最大5体 |
+| `rounds` | 任意 | 同じ並びを何巡させるか（1〜3）。省略時は1 |
+| `history` | 任意 | 文脈を渡したい場合のみ。`/api/lv/chat` と同じ形式 |
+
+> 総発言数（`agentIds` の数 × `rounds`）の上限は **6**。1発言＝1回のLLM呼び出しになるため、
+> 応答時間と利用料が膨らまないようサーバー側で上限を設けている。
+
+#### レスポンス（成功）
+```json
+{
+  "ok": true,
+  "turns": [
+    { "order": 1, "agentId": "alpha", "agentName": "Alpha", "model": "gpt-4o-mini",
+      "reply": "それは素晴らしいですね。どんなトレーニングを...", "ok": true, "error": "" },
+    { "order": 2, "agentId": "beta", "agentName": "Beta", "model": "gpt-4o-mini",
+      "reply": "個人差があるため、症状に応じたプログラムが重要です...", "ok": true, "error": "" }
+  ],
+  "transcript": "Alpha: それは素晴らしいですね。...\n\nBeta: 個人差があるため、...",
+  "count": 2,
+  "error": ""
+}
+```
+
+| フィールド | 説明 |
+| --- | --- |
+| `ok` | **全発言が成功したときのみ** true |
+| `turns` | 発言順（`order` は1始まり）に並んだ各AIの応答。個別の成否も持つ |
+| `transcript` | 全発言を `名前: 本文` で連結した文字列 |
+| `count` | `turns` の件数 |
+| `error` | エラー文言（成功時は空文字） |
+
+#### LabVIEW 側の実装を増やさないための設計
+- **既存VIの流用**：`ok` と `transcript` の2つだけ見れば会話が表示できる。
+  `Unflatten From JSON` のサンプル型を `{ok, transcript, count, error}` のクラスタにすれば、
+  配列を解析せずに済む（`turns` は無視しても壊れない）。
+- **1体ずつ表示したい場合**：`turns` を配列クラスタとして受け取り、`order` 順に並べる。
+- **部分成功**：1体が失敗しても残りの発言は続行される。失敗した発言は
+  `turns[i].ok = false` に記録され、`transcript` には `(エラー: ...)` として現れる。
+
+### 2.3 `GET /api/lv/agents` — エージェント一覧 / 疎通確認
 
 LV 側のドロップダウン作成や、サーバー起動確認（ヘルスチェック）に使う。
 
@@ -159,6 +233,11 @@ curl -X POST http://localhost:3000/api/lv/chat \
 curl -X POST http://localhost:3000/api/lv/chat \
   -H "Content-Type: application/json" \
   -d '{"text":"意見をください","agentId":"beta"}'
+
+# 複数AIの一括応答（段階B）
+curl -X POST http://localhost:3000/api/lv/multi \
+  -H "Content-Type: application/json" \
+  -d '{"text":"トレーニングを終えました","agentIds":["alpha","beta"]}'
 ```
 
 ---
@@ -180,6 +259,19 @@ curl -X POST http://localhost:3000/api/lv/chat \
 - [x] `agentId` でAIを切り替え可能（マルチエージェントの足場）
 - [x] エージェント一覧 `/api/lv/agents` を公開
 - [x] LV 側で `Trilogue Chat.vi` を作成し、文字列往復を確認（別PC間・実機で達成済み）
+
+## 6.5 第二段階（Phase 2-B）の状況
+
+サーバー側オーケストレーション＝「誰が何番目に話すか」をサーバーが持つ段階。
+
+- [x] 複数AIの応答を1リクエストでまとめて返す `/api/lv/multi` を公開
+- [x] 発言順の制御をサーバー側に実装（`agentIds` の並び × `rounds` 巡）
+- [x] 各AIが直前までの発言を読む形にし、単発の並列回答ではなく会話にした
+- [x] 1体が失敗しても残りを続行する部分成功の扱い
+- [x] 実機で複数AIの連続発言を確認（Alpha→Beta の2発言）
+- [ ] LV 側で `transcript` を表示するVIの作成
+- [ ] 段階C：ファシリテーターAIが発言順を動的に決める（`lib/orchestrator.ts` の
+      `resolveSpeakingOrder` を差し替える形で拡張できるようにしてある）
 
 ---
 
