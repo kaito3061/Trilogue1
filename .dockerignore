@@ -1,0 +1,9 @@
+# ビルドコンテキストから除外（イメージを小さく・秘密情報を入れない）
+node_modules
+.next
+.git
+.gitignore
+# 秘密情報はイメージに焼き込まず、実行時に env_file で渡す
+.env*.local
+*.log
+tests

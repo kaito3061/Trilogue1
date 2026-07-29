@@ -12,6 +12,9 @@
 .DS_Store
 *.pem
 
+# Office temporary lock files
+~$*
+
 # debug
 npm-debug.log*
 yarn-debug.log*

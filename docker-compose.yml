@@ -1,0 +1,14 @@
+# 使い方:
+#   1) .env.local.example をコピーして .env.local を作り、OPENAI_API_KEY を設定
+#   2) docker compose up --build
+#   3) ブラウザ/LV から http://localhost:3000 （LANなら http://<このPCのIP>:3000）
+services:
+  trilogue:
+    build: .
+    image: trilogue
+    ports:
+      - "3000:3000"
+    # APIキーは実行時に渡す（イメージには焼き込まない）。.env.local が必要。
+    env_file:
+      - .env.local
+    restart: unless-stopped
