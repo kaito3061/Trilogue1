@@ -10,6 +10,7 @@ Python で先に再現し、サーバーとの往復が成立しているかを�
 使い方:
     python3 scripts/lv_roundtrip_check.py
     python3 scripts/lv_roundtrip_check.py --base-url http://localhost:3000 --agent beta
+    python3 scripts/lv_roundtrip_check.py --multi-agents alpha,beta,gamma
 """
 
 from __future__ import annotations
@@ -17,6 +18,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import time
 import urllib.error
 import urllib.request
 
@@ -45,11 +47,17 @@ def main() -> int:
     parser.add_argument("--base-url", default="http://localhost:3000")
     parser.add_argument("--agent", default="alpha")
     parser.add_argument("--text", default="接続テストです。短く挨拶してください。")
-    parser.add_argument("--timeout", type=float, default=60.0)
+    parser.add_argument("--timeout", type=float, default=120.0)
+    parser.add_argument(
+        "--multi-agents",
+        default="alpha,beta",
+        help="段階B(/api/lv/multi)で発言させるエージェントIDをカンマ区切りで指定",
+    )
     args = parser.parse_args()
 
     agents_url = f"{args.base_url}/api/lv/agents"
     chat_url = f"{args.base_url}/api/lv/chat"
+    multi_url = f"{args.base_url}/api/lv/multi"
     failures = 0
 
     # 1) 疎通確認（GET /api/lv/agents） = サーバーが起きているか
@@ -91,6 +99,34 @@ def main() -> int:
             print(f"          reply: {res['reply']}")
         else:
             print(f"    FAIL  reply が空 or ok:false: {res}")
+            failures += 1
+    except urllib.error.URLError as e:
+        print(f"    FAIL  {e}")
+        failures += 1
+
+    # 4) 段階B（複数AIの一括応答）= turns がまとまって返るか
+    multi_agents = [a.strip() for a in args.multi_agents.split(",") if a.strip()]
+    print(f"[4] POST {multi_url}  (agentIds={multi_agents})")
+    try:
+        started = time.monotonic()
+        res = http_post_json(
+            multi_url, {"text": args.text, "agentIds": multi_agents}, args.timeout
+        )
+        elapsed = time.monotonic() - started
+        turns = res.get("turns")
+        if res.get("ok") and isinstance(turns, list) and len(turns) == len(multi_agents):
+            order = [f"{t.get('order')}:{t.get('agentName')}" for t in turns]
+            print(f"    PASS  {len(turns)}発言 order={order} 所要={elapsed:.1f}秒")
+            for turn in turns:
+                print(f"          {turn.get('agentName')}: {turn.get('reply')}")
+            # LV の POST は既定タイムアウト 10 秒。実測値を見せて設定漏れを防ぐ。
+            if elapsed > 9:
+                print(
+                    f"    NOTE  {elapsed:.1f}秒かかりました。LabVIEW の POST は既定 10 秒で"
+                    "タイムアウトするため、timeout (ms) を 120000 などに伸ばしてください。"
+                )
+        else:
+            print(f"    FAIL  ok:true と {len(multi_agents)}件の turns を期待: {res}")
             failures += 1
     except urllib.error.URLError as e:
         print(f"    FAIL  {e}")
