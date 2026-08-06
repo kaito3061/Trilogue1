@@ -273,7 +273,8 @@ curl -X POST http://localhost:3000/api/lv/multi \
 - [x] 各AIが直前までの発言を読む形にし、単発の並列回答ではなく会話にした
 - [x] 1体が失敗しても残りを続行する部分成功の扱い
 - [x] 実機で複数AIの連続発言を確認（Alpha→Beta の2発言）
-- [ ] LV 側で `transcript` を表示するVIの作成
+- [x] LV 側で `transcript` を表示するVIを作成し、**別PC間・実機で往復を確認**
+      （研究室Windows機のLV → LAN → サーバー、3体で約4.7秒）
 - [ ] 段階C：ファシリテーターAIが発言順を動的に決める（`lib/orchestrator.ts` の
       `resolveSpeakingOrder` を差し替える形で拡張できるようにしてある）
 
