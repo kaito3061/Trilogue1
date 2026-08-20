@@ -204,9 +204,9 @@ def roadmap(slide, x, y, w, h):
     """発展ロードマップ。Mermaidのtimelineは日本語が崩れるため図形で描く。"""
     stages = [
         ("現在", ["LabVIEWとLLMのJSON接続基盤", "サーバー側の会話制御", "（ここまで実装済み）"], True),
-        ("次段階", ["司会AIの導入", "ペルソナの動的な切り替え"], False),
-        ("中期", ["センサーデータと会話の統合", "時系列データの自動解析"], False),
-        ("長期", ["偏らないマルチエージェント", "評価空間の実現"], False),
+        ("次段階", ["司会AIの導入", "ペルソナの動的な切り替え", "（本研究で取り組む範囲）"], False),
+        ("中期", ["研究室の既存研究とLLMを", "繋ぐゲートウェイ化", "センサーデータとの統合"], False),
+        ("長期［ビジョン］", ["客観データと主観データを", "組み合わせた評価空間"], False),
     ]
     arrow = slide.shapes.add_shape(MSO_SHAPE.RIGHT_ARROW, x, y + h - Inches(0.42),
                                    w, Inches(0.32))
@@ -293,7 +293,7 @@ def build():
         "4.  システム構成",
         "5.  現在までの進捗　― 動作映像 ―",
         "6.  定量評価",
-        "7.  今後の方針",
+        "7.  今後の方針と本研究の位置づけ",
     ], y=Inches(1.7), size=26, gap=20)
     notes(s, "こちらの流れで発表します。中盤で実際に動いている様子を映像でお見せします。")
 
@@ -559,27 +559,91 @@ def build():
     s = base_slide(prs, "今後の方針", n)
     roadmap(s, Inches(0.6), Inches(1.3), Inches(12.1), Inches(2.2))
     _, tf = textbox(s, Inches(0.7), Inches(3.75), Inches(11.9), Inches(0.5))
-    para(tf, "直近で取り組むこと", size=20, bold=True, color=NAVY, first=True)
+    para(tf, "本研究で取り組む範囲（次段階）", size=20, bold=True, color=NAVY, first=True)
     items = [
         ("段階C：司会AIの導入", ["文脈に応じて次の発話者を決め、", "発言の偏りを制御する"]),
         ("役割（ペルソナ）の設計", ["どのような視点のAIを揃えるかは", "臨床的な知見が必要"]),
-        ("センサーデータとの統合", ["屈曲角・脈波などの客観データと", "会話を組み合わせた評価"]),
         ("通信の暗号化", ["実データを扱う段階では", "HTTPS化が必須"]),
     ]
     for i, (head, body) in enumerate(items):
-        card(s, Inches(0.7) + i * Inches(3.05), Inches(4.35), Inches(2.85), Inches(1.75),
-             head, body, head_size=15, body_size=12)
+        card(s, Inches(0.7) + i * Inches(4.1), Inches(4.35), Inches(3.8), Inches(1.6),
+             head, body, head_size=17, body_size=14)
+    _, tf = textbox(s, Inches(0.7), Inches(6.15), Inches(11.9), Inches(0.5))
+    para(tf, "中期以降は本研究の完了範囲の外にあり、発展の方向性として示している",
+         size=15, color=GRAY, first=True)
     notes(s,
           "今後の方針です。\n"
-          "まず段階Cとして、司会役のAIを導入します。文脈に応じて次に話すAIを決めることで、"
-          "発言の偏りを制御したいと考えています。\n"
+          "本研究で取り組む範囲は、図の「次段階」までです。まず段階Cとして司会役のAIを導入し、"
+          "文脈に応じて次に話すAIを決めることで、発言の偏りを制御したいと考えています。\n"
           "ただし、どのような視点のAIを揃えるべきか、どう質問を投げれば主観を引き出せるかは、"
           "臨床的な知見が必要な部分です。ここは相談しながら進めたいと考えています。\n"
-          "その先では、センサーで取得した客観データと会話から得た主観を組み合わせた評価、"
-          "そして実データを扱う際の通信の暗号化が課題になります。\n"
+          "中期以降は本研究の完了範囲の外で、発展の方向性としてお示ししているものです。"
+          "その中期の位置づけを、次のスライドで説明します。")
+
+    # ---------- 14. 本研究の位置づけ ----------
+    n += 1
+    s = base_slide(prs, "本研究の位置づけ ― 既存研究とLLMを繋ぐゲートウェイ", n)
+    _, tf = textbox(s, Inches(0.7), Inches(1.05), Inches(11.9), Inches(0.5))
+    para(tf, "研究室の既存研究はすでにLabVIEWで動いている。"
+             "本研究はその共通の出口としてLLMを繋ぐ役割を担える。",
+         size=17, color=GRAY, first=True)
+
+    cols = [
+        (Inches(0.6), Inches(3.5), "松田研の既存研究", [
+            "・リハビリ用デバイス", "　（力覚・屈曲データ）",
+            "・ハードウェア制御", "　（PWM / AD・DA変換）",
+            "・電動車椅子・計測系",
+            "", "いずれもLabVIEWが窓口"], GRAY),
+        (Inches(4.9), Inches(3.6), "本研究：接続基盤", [
+            "・LabVIEWから1回投げるだけ",
+            "・サーバーが会話を制御",
+            "・LabVIEW側に追加実装は不要",
+            "", "計測系を作り変えずに", "LLMを利用できる"], ACCENT),
+        (Inches(9.3), Inches(3.4), "LLM / マルチエージェント", [
+            "・複数AIによる対話",
+            "・主観情報の引き出し",
+            "・司会AIによる発言順の制御",
+            "", "（外部API / 将来は院内）"], NAVY),
+    ]
+    for cx, cw, head, lines, accent in cols:
+        card(s, cx, Inches(1.65), cw, Inches(2.6), head, lines,
+             accent=accent, head_size=18, body_size=14)
+    for ax in (Inches(4.25), Inches(8.65)):
+        ar = s.shapes.add_shape(MSO_SHAPE.RIGHT_ARROW, ax, Inches(2.7), Inches(0.55),
+                                Inches(0.45))
+        ar.fill.solid()
+        ar.fill.fore_color.rgb = ACCENT
+        ar.line.fill.background()
+        ar.shadow.inherit = False
+
+    band = s.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.6), Inches(4.55),
+                              Inches(12.1), Inches(1.1))
+    band.fill.solid()
+    band.fill.fore_color.rgb = NAVY
+    band.line.fill.background()
+    band.shadow.inherit = False
+    tf = band.text_frame
+    tf.word_wrap = True
+    tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+    para(tf, "本研究は、研究室の既存研究にLLMを接続する共通の入口（ゲートウェイ）になり得る",
+         size=22, bold=True, color=WHITE, align=PP_ALIGN.CENTER, first=True)
+
+    _, tf = textbox(s, Inches(0.6), Inches(5.85), Inches(12.1), Inches(0.6))
+    para(tf, "※ センサーデータとの統合は中期の目標。本研究の完了範囲は接続基盤の構築まで。",
+         size=15, color=RED, align=PP_ALIGN.CENTER, first=True)
+    notes(s,
+          "最後に、本研究の位置づけを整理します。\n"
+          "この研究室の既存研究は、リハビリ用デバイスにしてもハードウェア制御にしても、"
+          "いずれもLabVIEWが窓口になっています。\n"
+          "本研究が作ったのは、そのLabVIEWから1回投げるだけでLLMを使える接続基盤です。"
+          "つまり、既存の計測系を作り変えずにLLMを利用できるようになります。\n"
+          "この意味で本研究は、研究室の既存研究にLLMを接続する共通の入口、"
+          "ゲートウェイになり得ると考えています。\n"
+          "なお、センサーデータとの統合そのものは中期の目標であり、"
+          "本研究の完了範囲は接続基盤の構築までです。\n"
           "以上で発表を終わります。ありがとうございました。")
 
-    # ---------- 14. 結び ----------
+    # ---------- 15. 結び ----------
     s = base_slide(prs)
     band = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, Inches(2.7), SW, Inches(2.1))
     band.fill.solid()
