@@ -269,19 +269,21 @@ def build():
     band.fill.fore_color.rgb = NAVY
     band.line.fill.background()
     band.shadow.inherit = False
-    _, tf = textbox(s, Inches(1.0), Inches(1.2), Inches(11.3), Inches(2.6))
-    para(tf, "LabVIEWと大規模言語モデルを接続する", size=38, bold=True, color=WHITE,
+    _, tf = textbox(s, Inches(0.7), Inches(1.05), Inches(11.9), Inches(2.9))
+    para(tf, "既存計測系と大規模言語モデルを繋ぐ", size=38, bold=True, color=WHITE,
          align=PP_ALIGN.CENTER, first=True, space_after=10)
-    para(tf, "マルチエージェント対話基盤の構築", size=38, bold=True, color=WHITE,
-         align=PP_ALIGN.CENTER)
+    para(tf, "ゲートウェイの構築", size=38, bold=True, color=WHITE,
+         align=PP_ALIGN.CENTER, space_after=22)
+    para(tf, "― LabVIEWによる複数AI対話の実現 ―", size=25,
+         color=RGBColor(0xC8, 0xDA, 0xE6), align=PP_ALIGN.CENTER)
     _, tf = textbox(s, Inches(1.0), Inches(4.8), Inches(11.3), Inches(2.0))
     para(tf, "情報システム工学科　松田研究室", size=22, color=NAVY,
          align=PP_ALIGN.CENTER, first=True, space_after=8)
-    para(tf, "（学籍番号）　柴尾 海渡", size=26, bold=True, color=NAVY, align=PP_ALIGN.CENTER,
+    para(tf, "2022531028　柴尾 海翔", size=26, bold=True, color=NAVY, align=PP_ALIGN.CENTER,
          space_after=14)
-    para(tf, "2026年　月　日　　卒業研究 中間発表", size=18, color=GRAY, align=PP_ALIGN.CENTER)
-    notes(s, "松田研究室の柴尾です。「LabVIEWと大規模言語モデルを接続する、"
-             "マルチエージェント対話基盤の構築」について発表します。")
+    para(tf, "2026年 9月 28日　　卒業研究 中間発表", size=18, color=GRAY, align=PP_ALIGN.CENTER)
+    notes(s, "松田研究室の柴尾です。「既存計測系と大規模言語モデルを繋ぐゲートウェイの構築、"
+             "LabVIEWによる複数AI対話の実現」について発表します。")
 
     # ---------- 2. 目次 ----------
     n += 1
@@ -293,8 +295,9 @@ def build():
         "4.  システム構成",
         "5.  現在までの進捗　― 動作映像 ―",
         "6.  定量評価",
-        "7.  今後の方針と本研究の位置づけ",
-    ], y=Inches(1.7), size=26, gap=20)
+        "7.  検証計画　― 対話構造の比較 ―",
+        "8.  今後の方針と本研究の位置づけ",
+    ], y=Inches(1.6), size=25, gap=16)
     notes(s, "こちらの流れで発表します。中盤で実際に動いている様子を映像でお見せします。")
 
     # ---------- 3. 研究背景 ----------
@@ -353,8 +356,8 @@ def build():
     # ---------- 5. 研究目的 ----------
     n += 1
     s = base_slide(prs, "研究目的", n)
-    box = s.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.3),
-                             Inches(11.7), Inches(1.5))
+    box = s.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.2),
+                             Inches(11.7), Inches(1.15))
     box.fill.solid()
     box.fill.fore_color.rgb = NAVY
     box.line.fill.background()
@@ -362,23 +365,37 @@ def build():
     tf = box.text_frame
     tf.word_wrap = True
     tf.vertical_anchor = MSO_ANCHOR.MIDDLE
-    para(tf, "LabVIEWから大規模言語モデル（LLM）を利用できる接続基盤を構築し、",
-         size=22, bold=True, color=WHITE, align=PP_ALIGN.CENTER, first=True, space_after=6)
-    para(tf, "複数のAIが対話する形で主観情報を引き出せるようにする",
-         size=22, bold=True, color=WHITE, align=PP_ALIGN.CENTER)
+    para(tf, "本研究：LabVIEWから大規模言語モデル（LLM）を利用できる接続基盤を構築する",
+         size=22, bold=True, color=WHITE, align=PP_ALIGN.CENTER, first=True)
+
+    goal = s.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(2.5),
+                              Inches(11.7), Inches(1.15))
+    goal.fill.solid()
+    goal.fill.fore_color.rgb = LIGHT
+    goal.line.color.rgb = ACCENT
+    goal.line.width = Pt(2)
+    goal.shadow.inherit = False
+    tf = goal.text_frame
+    tf.word_wrap = True
+    tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+    para(tf, "最終目的：主観情報を多面的かつ効率的に収集できるLLM対話構造を明らかにする",
+         size=21, bold=True, color=ACCENT, align=PP_ALIGN.CENTER, first=True)
+
     for i, (head, body) in enumerate([
         ("① 画面変更に強い構成", ["LabVIEWをクライアントとし、", "画面の変更をLabVIEW側だけで", "完結できるようにする"]),
-        ("② 複数AIの会話制御", ["複数のAIが順番に発言する", "会話をサーバー側で制御する"]),
+        ("② 対話構造を試せる基盤", ["複数のAIが順番に発言する", "会話をサーバー側で制御し、", "構成を差し替えられるようにする"]),
         ("③ 引き継げる環境", ["研究室の他のPCでも", "同じように動く構成にする"]),
     ]):
-        card(s, Inches(0.8) + i * Inches(4.0), Inches(3.3), Inches(3.7), Inches(2.4),
-             head, body, head_size=19)
+        card(s, Inches(0.8) + i * Inches(4.0), Inches(3.85), Inches(3.7), Inches(2.3),
+             head, body, head_size=19, body_size=15)
     notes(s,
-          "研究目的です。LabVIEWから大規模言語モデルを利用できる接続基盤を構築し、"
-          "複数のAIが対話する形で主観情報を引き出せるようにすることを目指します。\n"
-          "具体的には3点です。1点目、LabVIEWをクライアントにして、画面の変更をLabVIEW側だけで"
-          "完結できるようにすること。2点目、複数のAIが順番に発言する会話をサーバー側で制御すること。"
-          "3点目、研究室の他のPCでも動く、引き継ぎ可能な構成にすることです。")
+          "研究目的です。本研究で作るのは、LabVIEWから大規模言語モデルを利用できる接続基盤です。\n"
+          "そのうえで最終的に目指すのは、主観情報を多面的かつ効率的に収集できるLLMの対話構造を"
+          "明らかにすることです。AIを何体並べるのが良いかは自明ではないので、"
+          "構成を比較して見極める必要があると考えています。\n"
+          "基盤側の具体目標は3点です。1点目、LabVIEWをクライアントにして、画面の変更を"
+          "LabVIEW側だけで完結できるようにすること。2点目、複数のAIの会話をサーバー側で制御し、"
+          "対話構造を差し替えて試せるようにすること。3点目、研究室の他のPCでも動く構成にすることです。")
 
     # ---------- 6. システム構成 ----------
     n += 1
@@ -452,27 +469,12 @@ def build():
           "段階Cが今後の課題で、司会役のAIが文脈に応じて次の発話者を決める形にします。"
           "今回の実装では、この発言順を決める部分だけを差し替えれば済む構造にしてあります。")
 
-    # ---------- 9. 動作映像① ----------
+    # ---------- 9. 動作映像 ----------
     n += 1
-    s = base_slide(prs, "動作映像 ①　単体AIとの往復", n)
-    video_placeholder(s, Inches(1.6), Inches(1.35), Inches(10.1), Inches(4.6),
-                      "動画① をここに挿入（30秒）",
-                      "撮影手順: docs/presentation_video_guide.md の 3-3")
-    _, tf = textbox(s, Inches(1.6), Inches(6.15), Inches(10.1), Inches(0.6))
-    para(tf, "LabVIEWで入力 → サーバー経由でLLMへ → 返信がLabVIEWに表示される",
-         size=19, bold=True, color=NAVY, align=PP_ALIGN.CENTER, first=True)
-    notes(s,
-          "ここから実際に動いている様子をお見せします。まずは基本となる、1体のAIとの往復です。\n"
-          "（再生）LabVIEWのフロントパネルに文章を入力して実行します。右側がサーバーのログで、"
-          "リクエストが届いているのが見えます。数秒後、AIの返信がLabVIEW側に表示されます。\n"
-          "ここまでが基本形で、この上に複数AIの仕組みを載せています。")
-
-    # ---------- 10. 動作映像② ----------
-    n += 1
-    s = base_slide(prs, "動作映像 ②　複数AIの会話", n)
+    s = base_slide(prs, "動作映像　複数AIの会話", n)
     video_placeholder(s, Inches(0.6), Inches(1.25), Inches(7.2), Inches(4.3),
-                      "動画② をここに挿入（60秒）",
-                      "撮影手順: docs/presentation_video_guide.md の 3-4")
+                      "ここに動画を挿入",
+                      "挿入 → ビデオ → このデバイス（埋め込み）")
     _, tf = textbox(s, Inches(0.6), Inches(5.7), Inches(7.2), Inches(1.3))
     para(tf, "入力（LabVIEWから1回送信するだけ）", size=15, bold=True, color=GRAY,
          first=True, space_after=6)
@@ -486,47 +488,23 @@ def build():
     ], Inches(8.1), Inches(1.45), Inches(4.6), col_widths=[0.7, 1.5, 6],
         row_h=Inches(0.95), head_h=Inches(0.42), size=13, head_size=14, highlight_row=2)
     card(s, Inches(8.1), Inches(5.0), Inches(4.6), Inches(1.9), "注目点", [
-        "2体目が「ただし」と受けている。",
         "同じ質問への答えを並べたのではなく、",
         "前の発言を読んだうえで発言しているため、",
-        "内容が重複せず視点が加わっている。"], accent=RED, head_size=18, body_size=14)
+        "内容が重複せず視点が加わっている。",
+        "※ この3体構成は比較条件の一つ（条件B）。"],
+        accent=RED, head_size=18, body_size=14)
     notes(s,
           "こちらが今回の中心です。LabVIEWから1回送信するだけで、3体のAIが順番に発言します。\n"
           "（再生）入力するのは、患者さんの感想を想定した1文だけです。実行すると、サーバー側で"
           "AIが順番に呼ばれていきます。ログを見ると、3回のやり取りが順に行われているのが分かります。\n"
-          "結果がこちらです。注目していただきたいのは、2体目が「ただし」と受けている点です。"
+          "結果がこちらです。注目していただきたいのは、2体目以降が前の発言を受けている点です。"
           "3体に同じ質問を投げて答えを並べたのではなく、前の発言を読んだうえで発言しているので、"
           "内容が重複せず、慎重な視点や発想を広げる視点が加わっています。\n"
+          "なお、この3体構成は比較条件の一つです。後のスライドで比較計画をお話しします。\n"
           "これは各AIに直前までの発言を文脈として渡し、既出の意見を繰り返さないよう指示しているためです。"
           "将来ここに専門領域ごとの役割を割り当てることで、多角的な評価につなげられると考えています。")
 
-    # ---------- 11. 動作映像③ ----------
-    n += 1
-    s = base_slide(prs, "動作映像 ③　別PCでの起動（移植性の検証）", n)
-    video_placeholder(s, Inches(0.7), Inches(1.3), Inches(8.0), Inches(4.7),
-                      "動画③ をここに挿入（40秒）",
-                      "撮影手順: docs/presentation_video_guide.md の 3-5")
-    card(s, Inches(9.1), Inches(1.4), Inches(3.5), Inches(4.5), "検証内容", [
-        "研究室の資産として",
-        "引き継げることが要件。",
-        "",
-        "Dockerで環境ごと固めた。",
-        "",
-        "・Node.js 不要",
-        "・Git 不要",
-        "・ZIP展開 → コマンド1行",
-        "",
-        "他メンバーのPCでも、",
-        "数年後の引き継ぎでも、",
-        "同じ環境を再現できる。"], body_size=14)
-    notes(s,
-          "3つ目は、このサーバーが他のPCでも動くかという検証です。\n"
-          "研究室の資産として引き継げることが重要なので、Dockerで環境ごと固めました。\n"
-          "（再生）リポジトリをZIPでダウンロードした状態から、コマンド1行で起動しています。"
-          "Node.jsもGitもインストールしていません。起動後、そのままAIの応答まで通ることが確認できます。\n"
-          "これにより、他のメンバーのPCでも、また数年後に引き継ぐ場合でも、同じ環境を再現できます。")
-
-    # ---------- 12. 定量評価 ----------
+    # ---------- 10. 定量評価 ----------
     n += 1
     s = base_slide(prs, "定量評価 ― 応答時間", n)
     table(s, [
@@ -539,8 +517,9 @@ def build():
     card(s, Inches(0.8), Inches(4.3), Inches(3.7), Inches(1.8), "自作部分の負荷は無視できる",
          ["遅延のほぼ全てがLLM側の応答待ち。", "自作サーバーの処理は7ミリ秒。"],
          accent=ACCENT, head_size=17, body_size=14)
-    card(s, Inches(4.8), Inches(4.3), Inches(3.7), Inches(1.8), "実用上は3体程度",
-         ["AIの数にほぼ比例して伸びる。", "会話として成立する範囲で", "3体程度が現実的。"],
+    card(s, Inches(4.8), Inches(4.3), Inches(3.7), Inches(1.8), "発言数にほぼ比例する",
+         ["3体が最適という意味ではない。", "構成ごとの応答時間を、",
+          "次の検証計画で比較材料に使う。"],
          accent=ACCENT, head_size=17, body_size=14)
     card(s, Inches(8.8), Inches(4.3), Inches(3.7), Inches(1.8), "タイムアウト対策",
          ["LabVIEWの通信タイムアウトは", "既定10秒のため3体では危険。", "延長して対応済み。"],
@@ -550,11 +529,47 @@ def build():
           "AIが3体の場合で約6.3秒です。内訳を見ると、自作サーバー側の処理は7ミリ秒で、"
           "残りはすべてLLM側の応答待ちでした。つまり遅延の原因はほぼ外部APIであり、"
           "自作部分のオーバーヘッドは無視できる水準です。\n"
-          "AIの数にほぼ比例して伸びるため、実際の対話では3体程度が現実的だと考えています。\n"
+          "応答時間は発言数にほぼ比例して伸びます。ただし3体が最適という意味ではなく、"
+          "この数字は次にお話しする構成の比較で材料として使います。\n"
           "なお、LabVIEWの通信タイムアウトは既定で10秒のため、3体だと危険な水準です。"
           "これは実装側で延長して対応しています。")
 
-    # ---------- 13. 今後の方針 ----------
+    # ---------- 13. 検証計画（対話構造の比較） ----------
+    n += 1
+    s = base_slide(prs, "検証計画 ― 主観情報の収集に適した対話構造の比較", n)
+    _, tf = textbox(s, Inches(0.7), Inches(1.05), Inches(11.9), Inches(0.5))
+    para(tf, "3体が最適という主張ではない。現在の構成は比較条件の一つであり、"
+             "A〜Dを比較して適した構造を明らかにする。",
+         size=17, color=GRAY, first=True)
+    table(s, [
+        ["条件", "LLM構成", "狙い", "本研究での状態"],
+        ["A", "LLM 1体", "基準条件", "実装済み（単体AI版）"],
+        ["B", "1体＋複数ペルソナ", "視点を変える効果", "実装済み ← 今回の動作映像"],
+        ["C", "複数LLM＋固定順", "独立した役割を持つ効果", "設定変更で対応可能"],
+        ["D", "複数LLM＋司会AI", "対話を動的に制御する効果", "次段階で実装"],
+    ], Inches(0.7), Inches(1.7), Inches(11.9), col_widths=[1, 3.2, 3.6, 4],
+        row_h=Inches(0.72), head_h=Inches(0.5), size=16, head_size=17, highlight_row=2)
+    card(s, Inches(0.7), Inches(5.25), Inches(5.8), Inches(1.5), "現在の3体の位置づけ",
+         ["同一モデルに3つの異なるペルソナを与え、",
+          "固定順で回している（＝条件B）。",
+          "エージェントごとにモデルを指定できる構造なので、",
+          "条件Cへはコード変更なしで移行できる。"], head_size=18, body_size=14)
+    card(s, Inches(6.8), Inches(5.25), Inches(5.8), Inches(1.5), "比較で見たいこと",
+         ["・重複のない多面的な意見が得られるか",
+          "・応答時間と発言数のつり合い",
+          "・患者の負担にならない対話の長さ"], accent=RED, head_size=18, body_size=14)
+    notes(s,
+          "ここまでお見せしたのは3体構成ですが、3体が最適だと考えているわけではありません。"
+          "現在の構成は比較条件の一つです。\n"
+          "最終的には、この表のA〜Dを比較します。条件Aは単体AI、条件Bは1体に複数のペルソナ、"
+          "条件Cは独立した複数のLLM、条件Dは司会AIによる動的な制御です。\n"
+          "今回の動作映像は条件Bにあたります。同一のモデルに3つの異なるペルソナを与えて"
+          "固定順で回しているためです。エージェントごとにモデルを指定できる構造にしてあるので、"
+          "条件Cへはコードを変えずに移行できます。\n"
+          "比較で見たいのは、重複のない多面的な意見が得られるか、応答時間とのつり合い、"
+          "そして患者の負担にならない対話の長さです。")
+
+    # ---------- 14. 今後の方針 ----------
     n += 1
     s = base_slide(prs, "今後の方針", n)
     roadmap(s, Inches(0.6), Inches(1.3), Inches(12.1), Inches(2.2))
@@ -625,8 +640,11 @@ def build():
     tf = band.text_frame
     tf.word_wrap = True
     tf.vertical_anchor = MSO_ANCHOR.MIDDLE
-    para(tf, "本研究は、研究室の既存研究にLLMを接続する共通の入口（ゲートウェイ）になり得る",
-         size=22, bold=True, color=WHITE, align=PP_ALIGN.CENTER, first=True)
+    para(tf, "本研究の価値は、LLMを使ったこと自体ではなく",
+         size=17, color=RGBColor(0xC8, 0xDA, 0xE6), align=PP_ALIGN.CENTER, first=True,
+         space_after=4)
+    para(tf, "研究室の様々な研究にLLMを挿せる土台を作ったことにある",
+         size=23, bold=True, color=WHITE, align=PP_ALIGN.CENTER)
 
     _, tf = textbox(s, Inches(0.6), Inches(5.85), Inches(12.1), Inches(0.6))
     para(tf, "※ センサーデータとの統合は中期の目標。本研究の完了範囲は接続基盤の構築まで。",
@@ -637,8 +655,8 @@ def build():
           "いずれもLabVIEWが窓口になっています。\n"
           "本研究が作ったのは、そのLabVIEWから1回投げるだけでLLMを使える接続基盤です。"
           "つまり、既存の計測系を作り変えずにLLMを利用できるようになります。\n"
-          "この意味で本研究は、研究室の既存研究にLLMを接続する共通の入口、"
-          "ゲートウェイになり得ると考えています。\n"
+          "この意味で本研究の価値は、LLMを使ったこと自体ではなく、"
+          "研究室の様々な研究にLLMを挿せる土台を作ったことにあると考えています。\n"
           "なお、センサーデータとの統合そのものは中期の目標であり、"
           "本研究の完了範囲は接続基盤の構築までです。\n"
           "以上で発表を終わります。ありがとうございました。")
@@ -659,24 +677,19 @@ def build():
     s = base_slide(prs, "補足資料")
     _, tf = textbox(s, Inches(0.8), Inches(1.6), Inches(11.7), Inches(4.5))
     for i, t in enumerate([
-        "補1．LabVIEW ブロックダイアグラム",
-        "補2．JSON の具体例",
-        "補3．自作部分と OSS の線引き",
-        "補4．発言順の制御",
-        "補5．堅牢性への配慮",
-        "補6．開発体制",
+        "補1．JSON の具体例",
+        "補2．自作部分と OSS の線引き",
+        "補3．発言順の制御",
+        "補4．堅牢性への配慮",
+        "補5．開発体制",
     ]):
         para(tf, t, size=22, color=NAVY, first=(i == 0), space_after=14)
 
     # 補1
-    s = base_slide(prs, "補1．LabVIEW ブロックダイアグラム")
-    picture(s, "bd", Inches(1.2), Inches(1.25), Inches(10.9), Inches(4.9),
-            caption="LabVIEW標準の部品のみで構成（HTTP Client VIs / JSON VIs）。追加ツールキットは不使用")
-
-    # 補2
-    s = base_slide(prs, "補2．JSON の具体例")
+    s = base_slide(prs, "補1．JSON の具体例")
     card(s, Inches(0.7), Inches(1.3), Inches(5.9), Inches(2.4), "リクエスト（LabVIEW → サーバー）", [
-        '{', '  "text": "リハビリを終えました…",', '  "agentIds": "alpha,beta,gamma",',
+        '{', '  "text": "リハビリを終えました…",',
+        '  "agentIds": ["alpha","beta","gamma"],',
         '  "rounds": 1', '}'], head_size=17, body_size=14)
     card(s, Inches(6.9), Inches(1.3), Inches(5.7), Inches(2.4), "レスポンス（サーバー → LabVIEW）", [
         '{', '  "ok": true,', '  "transcript": "Alpha: …\\nBeta: …",',
@@ -690,8 +703,8 @@ def build():
     ]:
         para(tf, t, size=17, space_after=8)
 
-    # 補3
-    s = base_slide(prs, "補3．自作部分と OSS の線引き")
+    # 補2
+    s = base_slide(prs, "補2．自作部分と OSS の線引き")
     table(s, [
         ["レイヤ", "使用技術", "区分"],
         ["LabVIEW側 VI", "LabVIEW標準（HTTP Client VIs / JSON VIs）", "自作VI"],
@@ -705,8 +718,8 @@ def build():
     para(tf, "Dify / Flowise / LiteLLM / NextChat / OpenWebUI などの既製LLM製品は不使用",
          size=19, bold=True, color=NAVY, align=PP_ALIGN.CENTER, first=True)
 
-    # 補4
-    s = base_slide(prs, "補4．発言順の制御")
+    # 補3
+    s = base_slide(prs, "補3．発言順の制御")
     _, tf = textbox(s, Inches(0.8), Inches(1.2), Inches(11.7), Inches(0.6))
     para(tf, "「誰が次に話すかを決める処理」と「実際に呼び出す処理」を分離してある",
          size=19, color=GRAY, first=True)
@@ -723,8 +736,8 @@ def build():
     para(tf, "1体が失敗しても中断せず、残りのAIの発言は返す。"
              "どの発言が失敗したかは個別に判別できるようにしている。", size=17)
 
-    # 補5
-    s = base_slide(prs, "補5．堅牢性への配慮")
+    # 補4
+    s = base_slide(prs, "補4．堅牢性への配慮")
     table(s, [
         ["項目", "対策", "理由"],
         ["入力の長さ", "8,000文字で打ち切り", "過大な入力によるコスト・遅延の増加を防ぐ"],
@@ -736,8 +749,8 @@ def build():
     ], Inches(0.8), Inches(1.35), Inches(11.7), col_widths=[3, 4, 6],
         row_h=Inches(0.72), head_h=Inches(0.5), size=15, head_size=16)
 
-    # 補6
-    s = base_slide(prs, "補6．開発体制")
+    # 補5
+    s = base_slide(prs, "補5．開発体制")
     card(s, Inches(0.8), Inches(1.35), Inches(3.7), Inches(2.3), "ブランチ運用", [
         "main：動作確認済みの版",
         "develop：統合用",

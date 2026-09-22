@@ -66,6 +66,11 @@ const buildSystemInstruction = (agent: AgentConfig, order: AgentConfig[]): strin
   ].join("\n");
 };
 
+// 発言ごとの進捗を1行ずつ出す。サーバーが順番に呼び出していることを
+// ログ側から追えるようにするため（動作確認と実演で経過が見えないと判断できない）。
+const logTurn = (position: number, total: number, agent: AgentConfig, suffix: string) =>
+  console.log(`[multi] ${position}/${total} ${agent.name} ${suffix}`);
+
 export interface OrchestrateParams {
   /** ユーザー（患者）の発話 */
   text: string;
@@ -91,6 +96,10 @@ export async function orchestrateTurns({
   const turns: LvMultiTurn[] = [];
 
   for (const [index, agent] of order.entries()) {
+    const position = index + 1;
+    const startedAt = Date.now();
+    logTurn(position, order.length, agent, "へ問い合わせ");
+
     try {
       const result = await generateReply({
         systemInstruction: buildSystemInstruction(agent, order),
@@ -98,8 +107,11 @@ export async function orchestrateTurns({
         history: trimHistory(context),
       });
 
+      const elapsed = ((Date.now() - startedAt) / 1000).toFixed(1);
+      logTurn(position, order.length, agent, `完了 (${elapsed}秒 / ${result.text.length}文字)`);
+
       turns.push({
-        order: index + 1,
+        order: position,
         agentId: agent.id,
         agentName: agent.name,
         model: result.model,
@@ -112,17 +124,20 @@ export async function orchestrateTurns({
         content: `${speakerLabel(agent)} ${result.text}`,
       });
     } catch (error) {
+      const message =
+        error instanceof LlmError
+          ? error.message
+          : "エージェントの呼び出しに失敗しました。";
+      logTurn(position, order.length, agent, `失敗: ${message}`);
+
       turns.push({
-        order: index + 1,
+        order: position,
         agentId: agent.id,
         agentName: agent.name,
         model: agent.model,
         reply: "",
         ok: false,
-        error:
-          error instanceof LlmError
-            ? error.message
-            : "エージェントの呼び出しに失敗しました。",
+        error: message,
       });
     }
   }
