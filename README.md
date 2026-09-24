@@ -54,7 +54,6 @@ LabVIEW を立ち上げなくても、LabVIEW と同じ手順でサーバーを�
 
 フロントパネルの URL を、サーバーを動かしている PC のアドレスに合わせてから実行する
 （同じ PC なら `http://localhost:3000`、別 PC なら `http://<サーバーPCのIP>:3000`）。
-作り方の詳細は `docs/labview_build_guide.md` と `docs/labview_multi_build_guide.md`。
 
 ---
 
@@ -164,8 +163,6 @@ Dockerイメージにも焼き込まず、起動時に環境変数として渡�
 | --- | --- |
 | `docs/lab_setup_guide.md` | 研究室のPCでサーバーを立てる手順（Windows / macOS） |
 | `docs/labview_interface_spec.md` | LabVIEW ⇄ サーバー間のJSON仕様 |
-| `docs/labview_build_guide.md` | LabVIEW側VIの作り方（AI 1体） |
-| `docs/labview_multi_build_guide.md` | LabVIEW側VIの作り方（複数AI） |
 | `docs/system_architecture.md` | 現状（As-Is）と将来構成（To-Be） |
 | `docs/architecture_decision_records.md` | 「なぜその作りにしたか」の記録 |
 | `docs/requirements_mvp.md` | 要件定義 |

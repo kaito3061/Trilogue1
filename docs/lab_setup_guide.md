@@ -153,12 +153,12 @@ python3 scripts/lv_roundtrip_check.py --base-url http://<サーバーIP>:3000
 
 ## 5. LabVIEW から接続する
 
-VIの作り方（どの部品をどう配線するか）はクリック単位で記載してある。
+LabVIEW 側は `labview/` の VI を開いて使う。
 
-| やりたいこと | 手順書 |
+| やりたいこと | VI |
 | --- | --- |
-| 単体AIと1往復する | `docs/labview_build_guide.md` |
-| 複数AIに順番に発言させる（段階B） | `docs/labview_multi_build_guide.md` |
+| 単体AIと1往復する | `labview/chat.vi` |
+| 複数AIに順番に発言させる（段階B） | `labview/multichat.vi` |
 
 API仕様（JSON構造・SubVI入出力）は **`docs/labview_interface_spec.md`** を参照。
 
@@ -193,7 +193,7 @@ API仕様（JSON構造・SubVI入出力）は **`docs/labview_interface_spec.md`
 | ポート3000が使用中 | 既に起動済み | 既存プロセスを停止するか別ポートを使用 |
 | `git` / `npm` / `winget` が「認識されていません」 | 未インストール（Windowsで多い） | ルートA（Docker）に切り替える。ZIP取得＋Docker Desktop だけで動く |
 | `docker compose` で `.env.local` が無いと言われる | ファイル名が `.env.local.txt` 等 | 拡張子表示を有効にして名前を修正 |
-| `Unflatten From JSON` でクラスタ要素のエラー | LV側のラベルがJSONに存在しない | `docs/labview_multi_build_guide.md` のエラー別対処を参照 |
+| `Unflatten From JSON` でクラスタ要素のエラー | LV側のラベルがJSONに存在しない | クラスタのラベルを `ok` / `transcript` / `error` に合わせる |
 
 ---
 
