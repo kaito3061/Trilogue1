@@ -20,9 +20,9 @@
 サーバーは **Windows / macOS / Linux** のどれでも起動できる。
 LabVIEW は研究室では Windows 機で使うことが多いが、Mac 版 LabVIEW でも同じ VI を開ける。
 
-最初に折れやすいのは、あとから出てくる **APIキー** と **Docker の初回** である。
-そこの画面は年ごとに変わる。この文書に残すのは「終わったときに何が見えていればよいか」と、
-画面が違ったときに AI へ聞く文面である。クリックの名前までは固定しない。
+最初に折れやすいのは、あとから出てくる **APIキー** と **Docker Desktop の初回** である。
+いまの画面での手順は節2・節3に書いてある。ボタン名が違ったら、
+「画面が変わったとき」の文面を AI に貼る。変わらないのは、終わったときに手元にあるものである。
 
 ---
 
@@ -113,64 +113,138 @@ AI にキーの中身は貼らない。エラー文と OS 名だけで足りる�
 
 ## 1. ファイルを手元に置く
 
-どのOSでも同じ。
+Git は使わなくてよい。ブラウザだけで足りる。
 
 1. ブラウザで開く: <https://github.com/kaito3061/Trilogue1>
-2. 緑の **Code** → **Download ZIP**
-3. ダウンロードした ZIP を展開する
-4. 展開したフォルダを、分かりやすい場所に置く（例: デスクトップの `Trilogue1`）
+2. 緑の **Code** を押す
+3. **Download ZIP** を押す（Clone しなくてよい）
+4. ダウンロードした `Trilogue1-main.zip` を展開する
+   - Windows: ZIP を右クリック → 「すべて展開」
+   - macOS: ZIP をダブルクリック
+   - Linux: ファイルマネージャで展開するか `unzip Trilogue1-main.zip`
+5. 展開してできたフォルダを、デスクトップなど分かりやすい場所へ移す
+6. フォルダを開いて、**同じ階層に** `README.md` と `docker-compose.yml` があることを確認する
 
-Git は使わなくてよい。
-
-展開した直後に見える一番上のフォルダ（`README.md` と `docker-compose.yml` がある場所）が作業場所である。
-一段内側に入ったまま作業すると、あとでキーが見つからない。
+よくある失敗: 展開すると `Trilogue1-main` の中に、もう一段 `Trilogue1-main` がある。
+作業するのは、`docker-compose.yml` が見える方である。一段深い方にいると、あとでキーが見つからない。
 
 ---
 
-## 2. Docker を入れる
+## 2. Docker Desktop を入れる
 
-すでに入っていて、ターミナルで `docker compose version` が通る人は飛ばしてよい。
-インストーラの画面が下と違うときは、上の「Docker が入らないとき」を AI に貼る。
-ここでの到達点は、**Docker が起動していること**だけである。
+ここが初見で一番止まる。
+到達点は次の2つが同時に満たされていること。
 
-### Windows
+1. Docker Desktop（または Linux の Docker Engine）が **起動している**
+2. ターミナルで `docker compose version` と打つと、バージョンの数字が出る
 
-### Windows
+すでに両方できている人は、節3へ進む。
+画面のボタン名が下と違うときは、「画面が変わったとき」の Docker 用の文面を AI に貼る。
 
-1. <https://www.docker.com/products/docker-desktop/> から **Windows 版** を入れる
-2. 入れ終わったら **PCを再起動** する
-3. Docker Desktop を起動し、左下が緑（Engine running）になるまで待つ
-4. WSL2 を有効にするよう言われたら、指示どおり有効化する。再起動が必要になる
+研究室の共有PCで、管理者権限が無くてインストーラが止まったら、自分では入れられない。
+そのときは先生または管理者に「Docker Desktop を入れて起動した状態にしてほしい」と頼む。
 
-### macOS
+### 2-1. Windows（Docker Desktop）
 
-1. 同じページから **Mac 版** を入れる
-   - チップの確認: 左上のリンゴマーク → 「この Mac について」
-   - **Apple M1 / M2 / M3 / M4** なら Apple silicon 版
-   - **Intel** と書いてあれば Intel 版
-2. アプリケーションに入った Docker を起動する
-3. メニューバーのクジラのアイコンが止まって、Docker Desktop が Ready になるまで待つ
-4. 初回は権限の許可を求められる。許可する
+前提: 64ビットの Windows 10 または 11。大学のPCでも、管理者で入れられることが多い。
 
-### Linux（Ubuntu など）
+1. ブラウザで <https://www.docker.com/products/docker-desktop/> を開く
+2. **Download for Windows**（または Windows 用のダウンロード）を押す
+3. 落ちてきた `Docker Desktop Installer.exe` をダブルクリックする
+4. 「このアプリがデバイスに変更を加えることを許可しますか」と出たら **はい**
+5. インストール中に **Use WSL 2 instead of Hyper-V** のようなチェックがあれば、**入れたまま**にする
+6. 完了したら、言われたとおり **PCを再起動** する。再起動しないとエンジンが起きない
+7. 再起動後、スタートメニューから **Docker Desktop** を開く
+8. 初回は利用規約（Accept）が出る。読む必要はなく、進めてよい
+9. 「WSL 2 のインストールが必要」または「Restart required」と出たら、指示どおり入れる／再起動する
+   - Microsoft のページに飛ばされたら、そのページの手順に従う
+   - よく出るのは `wsl --install` を管理者のコマンドプロンプトで実行する、という案内
+10. Docker Desktop の窓の **左下が緑** になり、`Engine running` と出るまで待つ
+    - 初回は2〜5分かかることがある。赤や黄のままだと、まだ使えない
+    - 右下の通知領域（時計の左）にクジラのアイコンが出ていれば起動している
 
-研究室の Linux 機でサーバーだけ動かす場合。
+確認（コマンドプロンプト）:
 
-```bash
-# 入っていなければ（Ubuntu の例）
-sudo apt update
-sudo apt install -y docker.io docker-compose-v2
-sudo usermod -aG docker "$USER"
+1. スタートメニューで `cmd` と打って、コマンドプロンプトを開く
+2. 次を打って Enter
+
+```bat
+docker compose version
 ```
 
-入れたあとは **一度ログアウトして入り直す**。
-確認:
+`Docker Compose version v2.` のように数字が出れば成功である。
+
+よく止まるところ:
+
+| 見えているもの | 意味 | やること |
+| --- | --- | --- |
+| `docker` は、内部コマンドまたは外部コマンド… | Docker Desktop が止まっているか、入っていない | スタートから Docker Desktop を開き、左下が緑になるまで待つ。そのあとコマンドプロンプトを開き直す |
+| WSL 2 installation is incomplete | Windows の仮想化部品が足りない | インストーラまたは Microsoft の案内どおり WSL2 を入れる。再起動する |
+| Hardware assisted virtualization | BIOS で仮想化がオフ | 研究室PCなら管理者に頼む。自分のPCなら BIOS の Virtualization / SVM を有効にする |
+| インストールできない（管理者） | 権限が無い | 自分では進めない。管理者に依頼する |
+
+### 2-2. macOS（Docker Desktop）
+
+チップの種類を間違えると入らない。先に確認する。
+
+1. 左上のリンゴマーク → **この Mac について**
+2. チップの欄を見る
+   - **Apple M1 / M2 / M3 / M4** → ダウンロードは **Apple silicon** 版
+   - **Intel** と書いてある → **Intel** 版
+
+入れ方:
+
+1. <https://www.docker.com/products/docker-desktop/> を開く
+2. Mac 用を選び、上で確認したチップの方を落とす
+3. 落ちてきた `.dmg` を開く
+4. クジラのアイコンを、Applications（アプリケーション）へドラッグする
+5. アプリケーションから Docker を開く
+   - 「インターネットからダウンロードされたアプリです」と出たら **開く**
+6. 初回はパスワード（Mac にログインするときのやつ）を求められる。入れる
+7. 利用規約（Accept）を進める
+8. メニューバー（画面右上）のクジラのアイコンが動き終わり、Docker Desktop が **Ready** になるまで待つ
+   - 初回は数分かかる
+
+確認（ターミナル）:
+
+1. アプリケーション → ユーティリティ → ターミナル を開く
+2. 次を打って Enter
 
 ```bash
 docker compose version
 ```
 
-バージョンが出ればよい。`docker-compose`（ハイフンあり）しか無い古い環境では、この文書の `docker compose` を `docker-compose` に読み替える。
+数字が出れば成功である。
+
+よく止まるところ:
+
+| 見えているもの | やること |
+| --- | --- |
+| チップが違うと言われる | 「この Mac について」を見て、正しい版を入れ直す |
+| クジラがいつまでも回る | 5分待っても Ready にならなければ、Docker Desktop を終了して開き直す |
+| `docker: command not found` | Docker Desktop が起動していない。クジラが Ready になってから、ターミナルを開き直す |
+
+### 2-3. Linux（Ubuntu など）
+
+研究室の Linux 機でサーバーだけ動かす場合。Docker Desktop でもよいが、Engine の方が軽い。
+
+```bash
+sudo apt update
+sudo apt install -y docker.io docker-compose-v2
+sudo usermod -aG docker "$USER"
+```
+
+入れたあとは **一度ログアウトして、入り直す**。これをしないと `permission denied` になる。
+
+```bash
+docker compose version
+```
+
+バージョンが出ればよい。
+`docker-compose`（ハイフンあり）しか無い古い環境では、この文書の `docker compose` を `docker-compose` に読み替える。
+
+Docker Desktop for Linux を使う場合は、公式の Linux 用インストーラに従う。
+画面が違ったら、AI への文面の OS を Linux にする。
 
 ---
 
@@ -194,12 +268,18 @@ OPENAI_MODEL=gpt-4o-mini
 
 ### Windows
 
-1. 展開したフォルダの `.env.local.example` をコピーする
-2. コピーの名前を **`.env.local`** にする
-3. メモ帳で開いて、上の2行を書く
+1. 展開したフォルダ（`docker-compose.yml` がある場所）をエクスプローラーで開く
+2. 上のメニュー **表示** → **ファイル名拡張子** にチェックを入れる
+   - Windows 11 なら「表示 → 表示」の中にあることが多い
+3. `.env.local.example` を右クリック → コピー → 同じフォルダで貼り付け
+4. コピーしたファイルの名前を **`.env.local`** にする
+   - 「拡張子を変更すると使えなくなる」と出たら **はい**
+   - 名前の末尾が `.txt` になっていないか、もう一度見る。なっていたら `.txt` を消す
+5. `.env.local` を右クリック → プログラムから開く → メモ帳
+6. `OPENAI_API_KEY=` の右に、キーを貼る。引用符 `"` は付けない
+7. 保存して閉じる
 
-エクスプローラーで **表示 → ファイル名拡張子** をオンにする。
-オフのままだと `.env.local.txt` になり、サーバーが読めない。
+`.env.local` は `docker-compose.yml` と **同じフォルダ** に置く。一段内側だと読めない。
 
 ### macOS
 
@@ -228,32 +308,39 @@ nano .env.local
 
 ## 4. サーバーを起動する
 
-起動するコマンドはどのOSでも同じ。違うのは、そのコマンドを打つ窓の開き方だけである。
+**先に Docker Desktop を起動し、左下が緑（Mac ならクジラが Ready）になるまで待つ。**
+止まっている状態でコマンドを打つと、必ず失敗する。
+
+起動するコマンドはどのOSでも同じ。
 
 ```bash
 docker compose up --build
 ```
 
-初回は数分かかる。2回目以降は短い。
-ログに `Ready` が出れば起動できている。
+初回はイメージを作るので 3〜10 分かかることがある。大学のWi-Fiが遅いとさらに伸びる。
+途中で `Downloading` や `#1` `#2` のような行が流れるのは正常である。止めない。
+ログに `Ready` が出れば起動できている。この窓は **閉じない**。閉じるとサーバーが止まる。
 
 ### Windows
 
-1. 展開したフォルダをエクスプローラーで開く
-2. アドレスバーに `cmd` と打って Enter
-3. 上のコマンドを実行する
+1. Docker Desktop の左下が緑であることを確認する
+2. `docker-compose.yml` があるフォルダをエクスプローラーで開く
+3. 上のアドレスバーをクリックして、今の文字を消す
+4. `cmd` と打って Enter（そのフォルダでコマンドプロンプトが開く）
+5. 開いた窓に `docker compose up --build` と打って Enter
+
+`docker-compose` とハイフンで繋がった古い書き方でも動くことがある。
+`docker` が認識されない、と出たら Docker Desktop が止まっている。緑を確認して、コマンドプロンプトを開き直す。
 
 ### macOS
 
-1. 展開したフォルダを Finder で開く
-2. フォルダを右クリック → 「サービス」または「フォルダに新規ターミナル」
-   - 出ないときは、アプリケーション → ユーティリティ → ターミナル を開き、
-     `cd` のあとにフォルダをターミナルへドラッグして Enter
-3. 上のコマンドを実行する
+1. メニューバーのクジラが Ready であることを確認する
+2. `docker-compose.yml` があるフォルダを Finder で開く
+3. フォルダを右クリック → 「フォルダに新規ターミナル」（または「サービス」の中）
+   - 出ないときは、ターミナルを開き、`cd `（シーディーとスペース）のあとに、そのフォルダをターミナルへドラッグして Enter
+4. `docker compose up --build` と打って Enter
 
 ### Linux
-
-ターミナルで展開したフォルダへ移動し、同じコマンドを実行する。
 
 ```bash
 cd ~/Desktop/Trilogue1
@@ -271,7 +358,17 @@ http://localhost:3000/api/lv/agents
 ```
 
 `alpha` / `beta` / `gamma` の名前が出る JSON が見えれば、サーバーは生きている。
-どのOSでもこの確認は同じである。
+どのOSでもこの確認は同じである。白い画面や「接続できない」なら、まだ Ready になっていないか、窓を閉じてしまっている。
+
+よく止まるところ:
+
+| 見えているもの | やること |
+| --- | --- |
+| `Cannot connect to the Docker daemon` | Docker Desktop を起動し、緑／Ready になってから同じコマンドをやり直す |
+| `.env.local` が無い / env file not found | 節3に戻る。`docker-compose.yml` と同じフォルダか、名前が `.env.local.txt` になっていないかを見る |
+| `APIキー未設定` で落ちる | `.env.local` の `OPENAI_API_KEY=` の右が空。キーを貼ってもう一度 `docker compose up --build` |
+| ずっと Downloading で止まる | ネットが切れている。大学Wi-Fiを繋ぎ直して、同じコマンドをもう一度 |
+| ポート 3000 が使われている | すでに起動している。ブラウザで上の URL を開いてみて、開くならそのままでよい |
 
 ---
 
