@@ -13,11 +13,46 @@ LabVIEW  ──HTTP/JSON──▶  このサーバー(Next.js)  ──HTTPS─�
 ```
 
 APIキーはサーバー側だけが持ち、**LabVIEW には渡さない**。
+サーバーは Docker で起動する。Node.js も Git も不要である。
 
 ---
 
-研究室の学生が使う場合は、まず **`docs/user_manual.md`** を上からなぞる。
-プログラミングは前提にしない。Windows / macOS / Linux の手順を分けて書いてある。
+## 初めて使う人へ
+
+研究室で Trilogue を使うだけなら、プログラムを読む必要はありません。
+
+1. [`docs/user_manual.md`](docs/user_manual.md) を開く
+2. ZIP をダウンロードする（GitHub 右上の Code → Download ZIP）
+3. Docker を起動する（初回で画面が違ったら、マニュアルの「画面が変わったとき」を AI に貼る）
+4. APIキーを `.env.local` に書く（キーの発行画面も同様）
+5. `labview/chat.vi` または `labview/multichat.vi` を開く
+
+詳細な環境構築は [`docs/lab_setup_guide.md`](docs/lab_setup_guide.md)、
+LabVIEW との通信仕様は [`docs/labview_interface_spec.md`](docs/labview_interface_spec.md) を参照してください。
+
+「なぜその作りにしたか」は [`docs/design_decisions.md`](docs/design_decisions.md) に短くまとめてあります。
+
+---
+
+## リポジトリ構成
+
+```
+Trilogue1/
+├── README.md                 ← いま見ている入口
+├── docs/
+│   ├── user_manual.md        ← 初めて使う人はここ（ZIP → 起動 → VI）
+│   ├── lab_setup_guide.md    ← 環境構築の詳細
+│   ├── labview_interface_spec.md
+│   ├── design_decisions.md   ← 設計で自分で決めたところ
+│   └── ...
+├── labview/
+│   ├── chat.vi               ← AI 1体
+│   └── multichat.vi          ← 複数AI
+├── app/api/lv/               ← LabVIEW 向け API
+├── lib/                      ← 会話制御・LLM呼び出し
+├── docker-compose.yml
+└── .env.local.example        ← これをコピーして APIキーを書く
+```
 
 ---
 
@@ -166,11 +201,12 @@ Dockerイメージにも焼き込まず、起動時に環境変数として渡�
 
 | ファイル | 内容 |
 | --- | --- |
-| `docs/user_manual.md` | **他の学生向けの使い方**（ZIP取得 → 起動 → LabVIEW） |
-| `docs/lab_setup_guide.md` | 研究室のPCでサーバーを立てる手順（Windows / macOS） |
+| `docs/user_manual.md` | **初めて使う人はここ**（ZIP取得 → 起動 → LabVIEW） |
+| `docs/lab_setup_guide.md` | 環境構築の詳細（Windows / macOS / Linux） |
 | `docs/labview_interface_spec.md` | LabVIEW ⇄ サーバー間のJSON仕様 |
+| `docs/design_decisions.md` | 設計で自分で決めたところ（質問への短い答え） |
+| `docs/architecture_decision_records.md` | 上記の詳細記録 |
 | `docs/system_architecture.md` | 現状（As-Is）と将来構成（To-Be） |
-| `docs/architecture_decision_records.md` | 「なぜその作りにしたか」の記録 |
 | `docs/requirements_mvp.md` | 要件定義 |
 
 > このブランチ（`review/handover`）には、**コードと引き継ぎに必要な資料だけ**を置いている。
