@@ -45,6 +45,17 @@ python3 scripts/lv_roundtrip_check.py --base-url http://localhost:3000
 
 LabVIEW を立ち上げなくても、LabVIEW と同じ手順でサーバーを叩いて結果を確認できる。
 
+研究室の LabVIEW 機では、`labview/` の VI を開いてそのまま使える。
+
+| ファイル | 接続先 | 用途 |
+| --- | --- | --- |
+| `labview/chat.vi` | `POST /api/lv/chat` | AI 1体との往復 |
+| `labview/multichat.vi` | `POST /api/lv/multi` | 1回送ると複数AIが順番に発言する |
+
+フロントパネルの URL を、サーバーを動かしている PC のアドレスに合わせてから実行する
+（同じ PC なら `http://localhost:3000`、別 PC なら `http://<サーバーPCのIP>:3000`）。
+作り方の詳細は `docs/labview_build_guide.md` と `docs/labview_multi_build_guide.md`。
+
 ---
 
 ## 2. LabVIEW 向けエンドポイント
@@ -109,6 +120,7 @@ lib/
   limits.ts            文字数・エージェント数・発言数の上限
 types/chat.ts          リクエスト/レスポンスの型（LabVIEW側の仕様と1対1で対応）
 tests/api.test.ts      各エンドポイントの自動テスト
+labview/               LabVIEW の VI（chat.vi / multichat.vi）
 scripts/               動作確認スクリプト
 docs/                  設計資料・LabVIEW側の作成手順
 ```
