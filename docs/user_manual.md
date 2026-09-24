@@ -13,7 +13,10 @@
 発言の順番はサーバーが決める。
 
 対象読者: 研究室の学生。プログラミングの知識は前提にしない。
-Windows の研究室PCで使う前提で書いてある。Mac でも同じ手順で動く。
+サーバーは **Windows / macOS / Linux** のどれでも起動できる。
+LabVIEW は研究室では Windows 機で使うことが多いが、Mac 版 LabVIEW でも同じ VI を開ける。
+
+自分のOSの見出しだけ読めば進める。OSごとの違いは、フォルダの開き方・Dockerの入れ方・IPの確認の3つだけである。
 
 ---
 
@@ -26,15 +29,22 @@ Windows の研究室PCで使う前提で書いてある。Mac でも同じ手順
 
 必要なもの:
 
-| 項目 | 内容 |
-| --- | --- |
-| Docker Desktop | サーバーを動かす箱。Node.js も Git も不要になる |
-| OpenAI APIキー | 研究室で使うキー。先生または柴尾に確認する |
-| LabVIEW | 2016以降。同梱の VI を開くだけ |
+| 項目 | Windows | macOS | Linux |
+| --- | --- | --- | --- |
+| サーバーを動かす箱 | [Docker Desktop](https://www.docker.com/products/docker-desktop/) | 同左（Apple チップ / Intel を選ぶ） | Docker Engine（または Docker Desktop） |
+| OpenAI APIキー | 研究室で使うキー。先生または柴尾に確認する | 同左 | 同左 |
+| LabVIEW | 2016以降。同梱の VI を開く | 同左（入っている場合） | LabVIEW は通常入っていない。サーバー役にする |
+
+よくある分担:
+
+- **同じPCで全部やる** … そのPCでサーバーを起動し、同じPCの LabVIEW から `http://localhost:3000` で繋ぐ
+- **サーバーと LabVIEW が別PC** … サーバー側は Windows / Mac / Linux のどれでもよい。LabVIEW側は URL をサーバーPCのIPにする
 
 ---
 
 ## 1. ファイルを手元に置く
+
+どのOSでも同じ。
 
 1. ブラウザで開く: <https://github.com/kaito3061/Trilogue1>
 2. 緑の **Code** → **Download ZIP**
@@ -43,17 +53,51 @@ Windows の研究室PCで使う前提で書いてある。Mac でも同じ手順
 
 Git は使わなくてよい。
 
+展開した直後に見える一番上のフォルダ（`README.md` と `docker-compose.yml` がある場所）が作業場所である。
+一段内側に入ったまま作業すると、あとでキーが見つからない。
+
 ---
 
-## 2. Docker Desktop を入れる
+## 2. Docker を入れる
 
-1. <https://www.docker.com/products/docker-desktop/> から Windows 版を入れる
+すでに入っていて起動できる人は、この節を飛ばしてよい。
+
+### Windows
+
+1. <https://www.docker.com/products/docker-desktop/> から **Windows 版** を入れる
 2. 入れ終わったら **PCを再起動** する
 3. Docker Desktop を起動し、左下が緑（Engine running）になるまで待つ
+4. WSL2 を有効にするよう言われたら、指示どおり有効化する。再起動が必要になる
 
-WSL2 を有効にするよう言われたら、指示どおり有効化する。再起動が必要になる。
+### macOS
 
-すでに入っている人はこの節を飛ばしてよい。
+1. 同じページから **Mac 版** を入れる
+   - チップの確認: 左上のリンゴマーク → 「この Mac について」
+   - **Apple M1 / M2 / M3 / M4** なら Apple silicon 版
+   - **Intel** と書いてあれば Intel 版
+2. アプリケーションに入った Docker を起動する
+3. メニューバーのクジラのアイコンが止まって、Docker Desktop が Ready になるまで待つ
+4. 初回は権限の許可を求められる。許可する
+
+### Linux（Ubuntu など）
+
+研究室の Linux 機でサーバーだけ動かす場合。
+
+```bash
+# 入っていなければ（Ubuntu の例）
+sudo apt update
+sudo apt install -y docker.io docker-compose-v2
+sudo usermod -aG docker "$USER"
+```
+
+入れたあとは **一度ログアウトして入り直す**。
+確認:
+
+```bash
+docker compose version
+```
+
+バージョンが出ればよい。`docker-compose`（ハイフンあり）しか無い古い環境では、この文書の `docker compose` を `docker-compose` に読み替える。
 
 ---
 
@@ -62,58 +106,102 @@ WSL2 を有効にするよう言われたら、指示どおり有効化する。
 サーバーは、キーが無いと LLM に問い合わせできない。
 キーはリポジトリに入っていない。自分のPCにだけ置く。
 
-1. 展開したフォルダの中にある `.env.local.example` をコピーする
-2. コピーしたファイルの名前を **`.env.local`** にする
-3. メモ帳で開き、次のように書く
+中身はどのOSでも同じ。
 
 ```
 OPENAI_API_KEY=ここにキーを貼る
 OPENAI_MODEL=gpt-4o-mini
 ```
 
-注意:
+このファイルをメールやチャットに貼らない。GitHub にも上げない。
 
-- エクスプローラーで「ファイル名拡張子」を表示する。
-  表示していないと `.env.local.txt` になり、サーバーが読めない。
-- このファイルをメールやチャットに貼らない。GitHub にも上げない。
+### Windows
+
+1. 展開したフォルダの `.env.local.example` をコピーする
+2. コピーの名前を **`.env.local`** にする
+3. メモ帳で開いて、上の2行を書く
+
+エクスプローラーで **表示 → ファイル名拡張子** をオンにする。
+オフのままだと `.env.local.txt` になり、サーバーが読めない。
+
+### macOS
+
+1. 展開したフォルダを Finder で開く
+2. `.env.local.example` が見えないときは、`Command + Shift + .` で隠しファイルを表示する
+3. そのファイルを複製し、名前を `.env.local` にする
+4. テキストエディットで開く。保存形式は **標準テキスト**（リッチテキストにしない）
+
+ターミナルからやる場合（展開したフォルダにいること）:
+
+```bash
+cp .env.local.example .env.local
+open -e .env.local
+```
+
+### Linux
+
+```bash
+cp .env.local.example .env.local
+nano .env.local
+```
+
+`Ctrl + O` で保存、`Ctrl + X` で閉じる。
 
 ---
 
 ## 4. サーバーを起動する
 
-1. 展開したフォルダをエクスプローラーで開く
-2. アドレスバーに `cmd` と打って Enter（そのフォルダでコマンドプロンプトが開く）
-3. 次を実行する
+起動するコマンドはどのOSでも同じ。違うのは、そのコマンドを打つ窓の開き方だけである。
 
-```bat
+```bash
 docker compose up --build
 ```
 
 初回は数分かかる。2回目以降は短い。
 ログに `Ready` が出れば起動できている。
 
-止めるときは、その窓で `Ctrl + C`。
-完全に止めるときは、同じフォルダでもう一度コマンドプロンプトを開き
+### Windows
 
-```bat
-docker compose down
+1. 展開したフォルダをエクスプローラーで開く
+2. アドレスバーに `cmd` と打って Enter
+3. 上のコマンドを実行する
+
+### macOS
+
+1. 展開したフォルダを Finder で開く
+2. フォルダを右クリック → 「サービス」または「フォルダに新規ターミナル」
+   - 出ないときは、アプリケーション → ユーティリティ → ターミナル を開き、
+     `cd` のあとにフォルダをターミナルへドラッグして Enter
+3. 上のコマンドを実行する
+
+### Linux
+
+ターミナルで展開したフォルダへ移動し、同じコマンドを実行する。
+
+```bash
+cd ~/Desktop/Trilogue1
+docker compose up --build
 ```
+
+権限エラー（`permission denied`）が出たら、節2の `usermod` のあとログアウトし直していない。
 
 ### 起動できたか確認する
 
-同じPCのブラウザで次を開く。
+サーバーを動かしている **そのPCのブラウザ** で次を開く。
 
 ```
 http://localhost:3000/api/lv/agents
 ```
 
 `alpha` / `beta` / `gamma` の名前が出る JSON が見えれば、サーバーは生きている。
+どのOSでもこの確認は同じである。
 
 ---
 
 ## 5. LabVIEW から使う
 
 同梱の VI を開く。ゼロから組む必要はない。
+VI の操作は OS で変わらない。
 
 | やりたいこと | 開くファイル |
 | --- | --- |
@@ -137,21 +225,28 @@ http://localhost:3000/api/lv/agents
 
 ### LabVIEW が別のPCにある場合
 
-1. サーバーを動かしているPCと、LabVIEWのPCを **同じWi-Fi / LAN** にする
-2. サーバーPCで IP を確認する
-   - Windows: コマンドプロンプトで `ipconfig` → `IPv4 アドレス`
-   - macOS: ターミナルで `ipconfig getifaddr en0`
-3. LabVIEW の URL を `http://192.168.x.x:3000` にする（自分のIPに置き換える）
-4. Windows で「セキュリティの重要な警告」が出たら、**プライベートネットワークを許可**する
+サーバー側のOSは問わない。LabVIEW側は URL だけ合わせる。
 
-IP は DHCP で変わることがある。繋がらなくなったらもう一度 `ipconfig` を見る。
+1. サーバーを動かしているPCと、LabVIEWのPCを **同じWi-Fi / LAN** にする
+2. サーバーPCで IP を確認する（次の表）
+3. LabVIEW の URL を `http://192.168.x.x:3000` にする（自分のIPに置き換える）
+4. ファイアウォールで 3000 番を許可する（次の表）
+
+| サーバーのOS | IPの確認 | ファイアウォール |
+| --- | --- | --- |
+| Windows | コマンドプロンプトで `ipconfig` → `IPv4 アドレス` | 初回の「セキュリティの重要な警告」で、プライベートネットワークを許可 |
+| macOS | ターミナルで `ipconfig getifaddr en0`（出なければ `en1`） | 初回の「着信を許可しますか」で許可。出なければ「システム設定 → ネットワーク → ファイアウォール」 |
+| Linux | ターミナルで `hostname -I`（先頭の `192.168.` または `10.`） | `sudo ufw allow 3000/tcp`（ufw を使っている場合） |
+
+IP は DHCP で変わることがある。繋がらなくなったら、もう一度この表で確認する。
+`169.254.` で始まる番号は、LAN に繋がっていないときの仮のIPなので使わない。
 
 ---
 
 ## 6. 自分の研究に挿すとき
 
 このシステムの役割は「LabVIEW から LLM を呼べる出口」である。
-自分の計測VIの隣に、同梱の VI を置くイメージでよい。
+自分の計測VIの隣に、同梱の VI を置くイメージでよい。OSは問わない。
 
 今のところ渡せるのは **文字列** である。
 
@@ -176,18 +271,21 @@ LabVIEW側は `Agent ID`（`alpha` / `beta` / `gamma`）を変えるだけで切
 
 ## 7. うまくいかないとき
 
-上から順に見る。
+上から順に見る。OS共通の項目と、OS固有の項目がある。
 
 | 症状 | まず疑うこと | やること |
 | --- | --- | --- |
-| `docker` が認識されない | Docker Desktop が止まっている | Docker Desktop を起動し、左下が緑になるまで待つ |
-| `.env.local` が無いと言われる | ファイル名が `.env.local.txt` | 拡張子を表示して、名前を `.env.local` にする |
+| `docker` が認識されない | Docker が止まっている／入っていない | 節2をやり直し、クジラのアイコンか左下が緑になるまで待つ |
+| Linux で permission denied | docker グループに入っていない | 節2の `usermod` のあと、ログアウトして入り直す |
+| `.env.local` が無いと言われる | 名前が違う、または一段内側にいる | Windows は拡張子を表示。Mac は `Command + Shift + .`。`docker-compose.yml` と同じ階層か確認 |
+| Mac で `.env.local` が見えない | ドットで始まるファイルは隠れる | Finder で `Command + Shift + .` |
 | サーバー起動時に「APIキー未設定」 | `.env.local` が空、または場所が違う | リポジトリの一番上のフォルダに置く |
 | ブラウザで `/api/lv/agents` が開かない | サーバーが止まっている／別PCから見ている | サーバーPCでは `localhost`、別PCでは IP を使う。同一LANかも確認 |
 | LabVIEW の返信が空 / OK が光らない | URL の末尾に `/` がある、またはIPが違う | `http://<IP>:3000` ちょうどにする |
 | 複数AIで途中で切れる | LabVIEW の待ち時間が短い | 既定は10秒。3体だと足りないことがある。タイムアウトを長くする（120000 ms） |
 | `ok:false` で error が出る | キーの残高、入力が空、レート制限 | `error` の文言を読む。空送信していないか確認 |
-| 昨日まで繋がっていた | IP が変わった | もう一度 `ipconfig` |
+| 昨日まで繋がっていた | IP が変わった | 節5の表でもう一度 IP を確認する |
+| Mac で Docker が重い／動かない | チップの種類を間違えて入れた | 「この Mac について」で Apple silicon か Intel かを見て入れ直す |
 
 LabVIEW の前に、必ずブラウザで `/api/lv/agents` を開く。
 ここで失敗しているなら、VI ではなくサーバー側の問題である。
@@ -196,9 +294,10 @@ LabVIEW の前に、必ずブラウザで `/api/lv/agents` を開く。
 
 ## 8. 止める・片付け
 
-使い終わったら:
+起動した窓で `Ctrl + C`（Mac も同じ）。
+完全に止めるときは、同じフォルダでもう一度次を実行する。
 
-```bat
+```bash
 docker compose down
 ```
 
@@ -214,7 +313,7 @@ ZIP を消しても、キーだけ残しておけば同じ手順で戻せる。
 | ファイル | 内容 |
 | --- | --- |
 | `README.md` | 全体の説明と起動の要約 |
-| `docs/lab_setup_guide.md` | サーバー設置の詳細（Windowsのつまずき含む） |
+| `docs/lab_setup_guide.md` | サーバー設置の詳細 |
 | `docs/labview_interface_spec.md` | LabVIEW とサーバーの間のJSONの約束 |
 | `docs/system_architecture.md` | システム全体の図 |
 | `labview/chat.vi` / `labview/multichat.vi` | 実際に開くVI |
