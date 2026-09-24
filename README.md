@@ -16,6 +16,11 @@ APIキーはサーバー側だけが持ち、**LabVIEW には渡さない**。
 
 ---
 
+研究室の学生が使う場合は、まず **`docs/user_manual.md`** を上からなぞる。
+プログラミングは前提にしない。Windows の研究室PC向けに書いてある。
+
+---
+
 ## 1. 動かす
 
 ### Docker を使う場合（Node.js も Git も不要）
@@ -161,6 +166,7 @@ Dockerイメージにも焼き込まず、起動時に環境変数として渡�
 
 | ファイル | 内容 |
 | --- | --- |
+| `docs/user_manual.md` | **他の学生向けの使い方**（ZIP取得 → 起動 → LabVIEW） |
 | `docs/lab_setup_guide.md` | 研究室のPCでサーバーを立てる手順（Windows / macOS） |
 | `docs/labview_interface_spec.md` | LabVIEW ⇄ サーバー間のJSON仕様 |
 | `docs/system_architecture.md` | 現状（As-Is）と将来構成（To-Be） |
