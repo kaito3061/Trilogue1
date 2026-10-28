@@ -214,6 +214,7 @@ Dockerイメージにも焼き込まず、起動時に環境変数として渡�
 | `docs/lab_setup_guide.md` | 環境構築の詳細（Windows / macOS / Linux） |
 | `docs/labview_interface_spec.md` | LabVIEW ⇄ サーバー間のJSON仕様 |
 | `docs/design_decisions.md` | 設計で自分で決めたところ（質問への短い答え） |
+| `docs/reproduction_test.md` | 他PCでの再現試験の記録（マニュアルだけで導入できるか） |
 | `docs/architecture_decision_records.md` | 上記の詳細記録 |
 | `docs/system_architecture.md` | 現状（As-Is）と将来構成（To-Be） |
 | `docs/requirements_mvp.md` | 要件定義 |
