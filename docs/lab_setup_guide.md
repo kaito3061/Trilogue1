@@ -14,6 +14,8 @@
 - サーバーは Next.js（Node.js）製の自作API。**既製のLLMツール（Dify / Flowise / LiteLLM / NextChat /
   OpenWebUI 等）は不使用**。実行環境として Docker を利用できる（Docker無しでも動く）。
 - 詳細は `docs/system_architecture.md`（システム構成資料）を参照。
+- 目的はリハビリを続けるための気分転換・励ましであり、**診療アシスト（診断支援）ではない**。
+  理由は `docs/design_decisions.md` の「このシステムの目的」にある。
 
 ---
 
@@ -30,7 +32,7 @@
 
 | 項目 | 内容 |
 | --- | --- |
-| OpenAI APIキー | 有料利用枠のあるキー。研究室の登録キーを使用 |
+| OpenAI APIキー | クレジット（前払い残高）のあるキー。研究室の共有キーをもらうか、自分で発行する。発行手順は `docs/user_manual.md` 節3 |
 | LabVIEW | 2016 以降（HTTP Client VIs / JSON VIs を使用） |
 
 ---
@@ -38,7 +40,9 @@
 ## 2. サーバーのセットアップ
 
 ### ① 取得と依存インストール
-リポジトリを取得したフォルダで:
+GitHub の `Code` → `Download ZIP` で取得して展開する（Git は不要）。
+
+ルートB（Node.js）の場合だけ、展開したフォルダで次を実行する。ルートA（Docker）では不要。
 
 ```bash
 npm install
@@ -107,11 +111,11 @@ docker compose up --build
 ### 手順
 1. **リポジトリを取得**（Git不要）
    - GitHub のページ右上 `Code` → **`Download ZIP`** → 展開。
-   - 展開先の例: `C:\Users\<ユーザー名>\Desktop\Trilogue`
+   - 展開先の例: `C:\Users\<ユーザー名>\Desktop\Trilogue1-main`
 2. **Docker Desktop をインストール**
-   - <https://www.docker.com/products/docker-desktop/> から Windows 版を入れる。
-   - インストール後にPCを再起動し、Docker Desktop を起動して
-     左下が緑（`Engine running`）になるまで待つ。
+   - 手順は `docs/user_manual.md` 節2-1 に、入れる前の確認（CPUの種類・仮想化・管理者権限）から
+     初回起動・WSL の更新まで書いてある。ここには書かない（二重に書くと片方が古くなるため）。
+   - 到達点は、左下が緑（`Engine running`）で、コマンドプロンプトの `docker compose version` が通ること。
 3. **`.env.local` を作る**
    - `.env.local.example` をコピーして `.env.local` にリネームし、`OPENAI_API_KEY=` に自分のキーを記入。
    - ⚠ エクスプローラーで拡張子が隠れていると `.env.local.txt` になりやすい。
@@ -169,7 +173,7 @@ API仕様（JSON構造・SubVI入出力）は **`docs/labview_interface_spec.md`
 2. `User Text` に発話、`Agent ID` に `alpha`（または `beta` / `gamma`）。
 3. Run → `Reply` にAI返信が出れば成功。
 
-> 複数AI版（`/api/lv/multi`）は**AIの数に比例して待ち時間が伸びる**（3体で約5秒）。
+> 複数AI版（`/api/lv/multi`）は**AIの数に比例して待ち時間が伸びる**（3体で約6秒。中間発表時点の実測で 6.0〜6.3 秒）。
 > LabVIEW の `POST` は既定10秒でタイムアウトするため、`timeout (ms)` を `120000` に伸ばすこと。
 
 ---
@@ -185,6 +189,9 @@ API仕様（JSON構造・SubVI入出力）は **`docs/labview_interface_spec.md`
 ---
 
 ## 7. トラブルシュート
+
+Docker の導入やAPIキー（残高切れ・キーの間違い）で止まったときは、`docs/user_manual.md` 節7 の表が詳しい。
+ここには設置と LabVIEW 接続に関わるものを置く。
 
 | 症状 | 原因の当たり | 対処 |
 | --- | --- | --- |

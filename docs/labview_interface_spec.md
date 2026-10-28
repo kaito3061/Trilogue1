@@ -138,6 +138,9 @@ Web UI 用の `/api/chat`（入れ子の `messages[]` を要求）とは別に�
 
 > 総発言数（`agentIds` の数 × `rounds`）の上限は **6**。1発言＝1回のLLM呼び出しになるため、
 > 応答時間と利用料が膨らまないようサーバー側で上限を設けている。
+>
+> 発言は順番に呼ぶので、待ち時間は発言数に比例する（3体で約6秒）。LabVIEW の `POST` は
+> 既定10秒でタイムアウトするため、`timeout (ms)` は `120000` にしておく。
 
 #### レスポンス（成功）
 ```json
@@ -193,7 +196,8 @@ LV 側のドロップダウン作成や、サーバー起動確認（ヘルス�
 
 ## 3. SubVI 設計の指針
 
-「対話1回」を1つの SubVI（`Trilogue Chat.vi` 想定）に閉じ込めると再利用しやすい。
+「対話1回」を1つの SubVI に閉じ込めると再利用しやすい。
+実物はリポジトリの `labview/chat.vi`（単体）と `labview/multichat.vi`（複数AI）である。
 
 ### 入出力端子（コネクタペーン）案
 | 種別 | 端子 | 型 | 備考 |
@@ -249,8 +253,11 @@ curl -X POST http://localhost:3000/api/lv/multi \
 
 | 状況 | コマンド | LV から叩くURL |
 | --- | --- | --- |
-| LV とサーバーが同一PC | `npm run dev` | `http://localhost:3000` |
-| LV が別PC（同一LAN） | `npm run dev:lan` | `http://<サーバーPCのIP>:3000` |
+| Docker で起動（推奨。同一PC・別PCとも） | `docker compose up --build` | 同一PC: `http://localhost:3000` / 別PC: `http://<サーバーPCのIP>:3000` |
+| Node.js、LV とサーバーが同一PC | `npm run dev` | `http://localhost:3000` |
+| Node.js、LV が別PC（同一LAN） | `npm run dev:lan` | `http://<サーバーPCのIP>:3000` |
+
+導入の手順は `docs/user_manual.md` にある。
 
 別PCから繋ぐ場合は、サーバーPCのファイアウォールで 3000 番ポートの受信を許可すること。
 
@@ -283,5 +290,6 @@ curl -X POST http://localhost:3000/api/lv/multi \
 
 - 会話履歴の永続化はサーバー側に無い。文脈が要るなら LV が `history` を保持して毎回送る方式（ステートレス）。
 - 現状 OpenAI 固定。Gemini 等への切替は `lib/llm.ts` の差し替えで対応予定（プロバイダ抽象化は最小実装済み）。
-- 有料枠が必要になった場合はキー登録・申請で対応（環境変数 `OPENAI_API_KEY` の差し替えのみでLV側の変更は不要）。
+- OpenAI API は前払いのクレジット制。残高が切れると `ok:false`（「LLM の利用上限に達しました」）になる。
+  キーを替えるときは `.env.local` の `OPENAI_API_KEY` を差し替えるだけで、LV 側の変更は不要。
 - C++ SDK の DLL 化は技術的には可能だが、当面は HTTP 直結で開発効率を優先する。
