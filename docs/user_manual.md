@@ -693,3 +693,4 @@ ZIP を消しても、キーだけ残しておけば同じ手順で戻せる。
 | `docs/labview_interface_spec.md` | LabVIEW とサーバーの間のJSONの約束 |
 | `docs/system_architecture.md` | システム全体の図 |
 | `labview/chat.vi` / `labview/multichat.vi` | 実際に開くVI |
+| `docs/labview_ui_guide.md` | 患者さんに見せる会話画面を LabVIEW で作る手順 |

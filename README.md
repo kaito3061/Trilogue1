@@ -52,6 +52,7 @@ Trilogue1/
 │   ├── user_manual.md        ← 初めて使う人はここ（ZIP → 起動 → VI）
 │   ├── lab_setup_guide.md    ← 環境構築の詳細
 │   ├── labview_interface_spec.md
+│   ├── labview_ui_guide.md   ← 患者向けの画面を LabVIEW で作る手順
 │   ├── design_decisions.md   ← 設計で自分で決めたところ
 │   └── ...
 ├── labview/
@@ -213,6 +214,7 @@ Dockerイメージにも焼き込まず、起動時に環境変数として渡�
 | `docs/user_manual.md` | **初めて使う人はここ**（ZIP取得 → 起動 → LabVIEW） |
 | `docs/lab_setup_guide.md` | 環境構築の詳細（Windows / macOS / Linux） |
 | `docs/labview_interface_spec.md` | LabVIEW ⇄ サーバー間のJSON仕様 |
+| `docs/labview_ui_guide.md` | LabVIEW で患者向けの会話画面を作る手順 |
 | `docs/design_decisions.md` | 設計で自分で決めたところ（質問への短い答え） |
 | `docs/reproduction_test.md` | 他PCでの再現試験の記録（マニュアルだけで導入できるか） |
 | `docs/architecture_decision_records.md` | 上記の詳細記録 |
