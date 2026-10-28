@@ -217,6 +217,7 @@ Dockerイメージにも焼き込まず、起動時に環境変数として渡�
 | `docs/labview_ui_guide.md` | LabVIEW で患者向けの会話画面を作る手順 |
 | `docs/design_decisions.md` | 設計で自分で決めたところ（質問への短い答え） |
 | `docs/integration_notes.md` | 連携時に実際にハマったことと抜け方の記録 |
+| `docs/tower_pc_setup.md` | 検証用 Windows 機（控室のタワー PC）のクリーンインストールからの手順と記録 |
 | `docs/reproduction_test.md` | 他PCでの再現試験の記録（マニュアルだけで導入できるか） |
 | `docs/architecture_decision_records.md` | 上記の詳細記録 |
 | `docs/system_architecture.md` | 現状（As-Is）と将来構成（To-Be） |

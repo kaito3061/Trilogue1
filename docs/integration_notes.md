@@ -100,7 +100,7 @@
 
 ## 7. これから記録すること
 
-- 控室のタワー PC（先生がキープしている機体）で、Windows が起動するか、そこから Docker・LabVIEW の往復まで通るか
+- 控室のタワー PC（先生がキープしている機体）で、Windows が起動するか、そこから Docker・LabVIEW の往復まで通るか（手順と記録欄は `docs/tower_pc_setup.md`）
 - 研究室の友達が、マニュアルだけで Windows 機に1から入れたときに止まった場所
 - Gemini（AI Studio の無料枠）を追加でつないだときにハマったこと
 - 患者向けの画面（`docs/labview_ui_guide.md`）を実際に組んだときに、手順書と違ったところ
