@@ -53,6 +53,7 @@ Trilogue1/
 │   ├── lab_setup_guide.md    ← 環境構築の詳細
 │   ├── labview_interface_spec.md
 │   ├── labview_ui_guide.md   ← 患者向けの画面を LabVIEW で作る手順
+│   ├── labview_community_install.md ← 自分の PC に LabVIEW 無料版を入れる手順
 │   ├── design_decisions.md   ← 設計で自分で決めたところ
 │   └── ...
 ├── labview/
@@ -215,6 +216,7 @@ Dockerイメージにも焼き込まず、起動時に環境変数として渡�
 | `docs/lab_setup_guide.md` | 環境構築の詳細（Windows / macOS / Linux） |
 | `docs/labview_interface_spec.md` | LabVIEW ⇄ サーバー間のJSON仕様 |
 | `docs/labview_ui_guide.md` | LabVIEW で患者向けの会話画面を作る手順 |
+| `docs/labview_community_install.md` | 自分の PC に LabVIEW 無料版（Community Edition）を入れる手順。個人の学習用のみで、研究・大学の PC には使えない |
 | `docs/design_decisions.md` | 設計で自分で決めたところ（質問への短い答え） |
 | `docs/integration_notes.md` | 連携時に実際にハマったことと抜け方の記録 |
 | `docs/tower_pc_setup.md` | 検証用 Windows 機（控室のタワー PC）のクリーンインストールからの手順と記録 |

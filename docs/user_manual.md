@@ -66,7 +66,7 @@ LabVIEW は研究室では Windows 機で使うことが多いが、Mac 版 LabV
 **LabVIEW のライセンスに注意する。**
 研究室の研究に使う LabVIEW は、大学・研究室が持っているライセンスのものを使う。
 無料の **LabVIEW Community Edition は、大学での研究・授業には使えない**（NI のライセンスの条件。2026-11 に確認）。
-学生が自分の PC で、個人の学習のために使うのは認められている。
+学生が自分の PC で、個人の学習のために使うのは認められている（入れ方は `docs/labview_community_install.md`）。
 どのライセンスを使えばよいか分からなければ、先生に確認する。
 条件は変わることがあるので、新しく入れるときは NI の公式ページ
 「[Community Edition Software Usage Details](https://www.ni.com/en/support/documentation/supplemental/20/labview-community-edition-usage-details.html)」で確かめる。
@@ -703,3 +703,4 @@ ZIP を消しても、キーだけ残しておけば同じ手順で戻せる。
 | `docs/system_architecture.md` | システム全体の図 |
 | `labview/chat.vi` / `labview/multichat.vi` | 実際に開くVI |
 | `docs/labview_ui_guide.md` | 患者さんに見せる会話画面を LabVIEW で作る手順 |
+| `docs/labview_community_install.md` | 自分の PC に LabVIEW 無料版を入れる手順（個人の学習用のみ。研究・大学の PC には使えない） |
