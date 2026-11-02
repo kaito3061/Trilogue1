@@ -63,6 +63,14 @@ LabVIEW は研究室では Windows 機で使うことが多いが、Mac 版 LabV
 | OpenAI APIキー | 研究室で使うキー。先生または柴尾に確認する | 同左 | 同左 |
 | LabVIEW | 2016以降。同梱の VI を開く | 同左（入っている場合） | LabVIEW は通常入っていない。サーバー役にする |
 
+**LabVIEW のライセンスに注意する。**
+研究室の研究に使う LabVIEW は、大学・研究室が持っているライセンスのものを使う。
+無料の **LabVIEW Community Edition は、大学での研究・授業には使えない**（NI のライセンスの条件。2026-11 に確認）。
+学生が自分の PC で、個人の学習のために使うのは認められている。
+どのライセンスを使えばよいか分からなければ、先生に確認する。
+条件は変わることがあるので、新しく入れるときは NI の公式ページ
+「[Community Edition Software Usage Details](https://www.ni.com/en/support/documentation/supplemental/20/labview-community-edition-usage-details.html)」で確かめる。
+
 よくある分担:
 
 - **同じPCで全部やる** … そのPCでサーバーを起動し、同じPCの LabVIEW から `http://localhost:3000` で繋ぐ
@@ -574,6 +582,7 @@ http://localhost:3000/api/lv/agents
 
 同梱の VI を開く。ゼロから組む必要はない。
 VI の操作は OS で変わらない。
+LabVIEW がまだ入っていない PC に入れるときは、ライセンスに注意する（節0の「必要なもの」の下）。
 
 | やりたいこと | 開くファイル |
 | --- | --- |

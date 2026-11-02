@@ -69,6 +69,12 @@
 教訓: LabVIEW 側でエラーが出たら、先に `python3 scripts/lv_roundtrip_check.py` を通す。
 これが `ALL PASS` なら、サーバーは正常で、直すのは LabVIEW 側だけである。
 
+### LabVIEW のライセンス
+
+| 日付 | 場面 | 分かったこと | どうしたか |
+| --- | --- | --- | --- |
+| 2026-11-02 | 新しい Windows 機に LabVIEW を入れる計画を立てたとき、無料版（Community Edition）を使う案が出た | NI の公式ページ「Community Edition Software Usage Details」に、Community Edition は個人・非営利向けで、**大学での研究・授業には使えない** と明記されている。大学の PC や研究には、Academic Volume License などの学術用ライセンスが要る | 無料版は使わず、大学・研究室のライセンスを使う方針にした。マニュアル節0とタワー PC の手順書に注意を書いた |
+
 ---
 
 ## 5. LLM の API

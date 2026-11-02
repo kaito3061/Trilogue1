@@ -176,7 +176,9 @@ Windows 10 はサポートが終わっていて、セキュリティの更新が
 4. サーバーを起動し、ブラウザで `http://localhost:3000/api/lv/agents` を開く（節4）
 5. LabVIEW から繋ぐ（節5）
    - このタワーに LabVIEW が入っていなければ、研究室の別の Windows 機の LabVIEW から、LAN 越しにこのタワーへ繋ぐ
-   - LabVIEW を入れる場合はライセンスが必要なので、先生に確認する
+   - LabVIEW を入れる場合は、**大学・研究室のライセンスを使う**。どのライセンスで入れるかは先生に確認する
+     - 無料の LabVIEW Community Edition は、大学での研究には使えない（`docs/user_manual.md` 節0の「必要なもの」の下）
+     - LabVIEW のバージョンは、このタワーの Windows で動くものを選ぶ。NI の「LabVIEW and Microsoft Windows Compatibility」で確かめる
    - LabVIEW が無くても、`python3 scripts/lv_roundtrip_check.py --base-url http://<タワーのIP>:3000` で同じ往復を確かめられる（Python が要る）
 
 ---
