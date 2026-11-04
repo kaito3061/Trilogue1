@@ -134,6 +134,133 @@ Docker の入れ方そのものが大きく変わっていたとき（何年も�
 
 ---
 
+## コマンドの打ち方（黒い画面を初めて使う人へ）
+
+この文書では、ところどころで文字を打って PC に指示する（コマンドを実行する）。
+打つ場所は、Windows では **コマンドプロンプト**、macOS と Linux では **ターミナル** という窓である。
+どちらも「文字を打って Enter を押すと、結果が文字で返ってくる窓」で、中身の考え方は同じである。
+
+### 窓を開く
+
+| OS | 開き方 |
+| --- | --- |
+| Windows | スタートボタン（画面下の Windows マーク）を押し、`cmd` と打つ → 出てきた **コマンドプロンプト** を押す |
+| Windows（管理者） | 上と同じく `cmd` と打ち、**コマンドプロンプトを右クリック → 管理者として実行** →「変更を加えることを許可しますか」で **はい** |
+| macOS | `Command + Space` で Spotlight を開き、`ターミナル` と打って Enter（または Finder → アプリケーション → ユーティリティ → ターミナル） |
+| Linux | `Ctrl + Alt + T`（またはアプリ一覧から「端末」「Terminal」） |
+
+開くと、最後の行に次のような文字が出て、その右でカーソルが点滅する。これを **プロンプト** と呼ぶ。
+プロンプトが出ているときが「次のコマンドを打てる状態」である。
+
+```
+C:\Users\matsudaLAB-SACRA>
+```
+
+（Windows。`>` の左が **今いるフォルダ**。開いた直後は自分のユーザーのフォルダにいる）
+
+```
+shibaokaito@MacBook-Air ~ %
+```
+
+（macOS。`%` の左の `~` が今いるフォルダ。`~` は自分のホームフォルダの略。Linux は `$` で終わる）
+
+### コマンドを打つ・貼る
+
+1. この文書のコマンドの枠の中の文字を、**1行ずつ** 打つか、コピーして貼る
+   - Windows のコマンドプロンプト: `Ctrl + V`、または窓の中で右クリック
+   - macOS: `Command + V`
+   - Linux のターミナル: `Ctrl + Shift + V`
+2. **Enter** を押す。Enter を押すまでは何も起きない
+3. 結果が出て、もう一度プロンプトが出たら終わり。次のコマンドに進む
+
+注意:
+
+- 枠の中に **複数の行があるときは、1行ずつ** 貼って Enter する
+- `#` で始まる行は説明である。打たない（貼ると `command not found: #` などと出る）
+- 結果として出てくる文字（この文書で「次のように出る」と書いてある枠）は、打つものではない
+- **サーバーの起動（節4）のように、終わらずに動き続けるコマンドもある。** そのときはプロンプトが戻ってこない。止めたいときは `Ctrl + C`（Mac も `Ctrl`。`Command` ではない）
+- 打ち間違えたら、Enter の前なら `Backspace` で消せる。Enter のあとでも、エラーが出るだけで壊れることはない。打ち直せばよい
+- Mac / Linux で `sudo` から始まるコマンドは、パスワードを聞かれる。打っても画面には何も出ないが、入力はされている。打ち終えたら Enter
+
+### フォルダを移動する（`cd`）
+
+一部のコマンドは、**`docker-compose.yml` があるフォルダの中で** 打たないと動かない（下の表）。
+窓を開いた直後はホームフォルダにいるので、`cd`（change directory）でそこへ移動する。
+
+この文書では、ZIP を展開したフォルダを **デスクトップ** に置いた前提で書く（節1）。
+
+**Windows**
+
+一番確実なのは、エクスプローラーから直接そのフォルダでコマンドプロンプトを開く方法である。
+
+1. エクスプローラーで、`docker-compose.yml` が見えるフォルダを開く
+2. 上のアドレスバー（`> デスクトップ > Trilogue1-main` のように出ている欄）を **1回クリック** する。文字が青く選ばれた状態になる
+3. そのまま `cmd` と打って Enter
+4. 開いたコマンドプロンプトのプロンプトが、そのフォルダになっている
+
+```
+C:\Users\matsudaLAB-SACRA\Desktop\Trilogue1-main>
+```
+
+すでに開いているコマンドプロンプトで移動するときは、`cd` を使う。
+
+```bat
+cd /d "%USERPROFILE%\Desktop\Trilogue1-main"
+```
+
+- `%USERPROFILE%` は自分のユーザーのフォルダ（`C:\Users\自分の名前`）の略である。そのまま打ってよい
+- `"…"` で囲むのは、フォルダ名に空白や日本語が入っても動くようにするため
+- 「指定されたパスが見つかりません。」と出たら、デスクトップが OneDrive の中にある PC である（Windows 11 で多い）。
+  エクスプローラーでそのフォルダを開き、アドレスバーを1回クリックすると本当の場所（例: `C:\Users\名前\OneDrive\デスクトップ\Trilogue1-main`）が出る。
+  それをコピーして、`cd /d "` と `"` のあいだに貼る
+
+**macOS**
+
+```bash
+cd ~/Desktop/Trilogue1-main
+```
+
+- 何も出ずにプロンプトが `… Trilogue1-main %` に変われば移動できている
+- `no such file or directory` と出たら、名前か場所が違う。`cd `（`cd` とスペース1つ）まで打ってから、Finder のフォルダをターミナルの窓へドラッグすると、場所が自動で入る。そのあと Enter
+- Finder でフォルダを右クリック →「フォルダに新規ターミナル」でも、そのフォルダで開ける（出ないときは「サービス」の中にある）
+
+**Linux**
+
+```bash
+cd ~/Desktop/Trilogue1-main
+```
+
+日本語環境では `~/デスクトップ/Trilogue1-main` のこともある。
+
+### 正しいフォルダにいるか確かめる
+
+移動したら、毎回これで確かめる。`docker-compose.yml` の名前が出れば、正しい場所にいる。
+
+| OS | 打つもの | 正しい場所なら | 違う場所なら |
+| --- | --- | --- | --- |
+| Windows | `dir docker-compose.yml` | `docker-compose.yml` の行と `1 個のファイル` が出る | `ファイルが見つかりません` |
+| macOS / Linux | `ls docker-compose.yml` | `docker-compose.yml` と1行出る | `No such file or directory` |
+
+違う場所なら、上の「フォルダを移動する」をやり直す。
+`Trilogue1-main` の中にもう一段 `Trilogue1-main` があるときは、さらに `cd Trilogue1-main` で中に入ってから確かめる。
+
+### どのコマンドを、どこで打つか
+
+| コマンド | 出てくる節 | どの窓で | どのフォルダで |
+| --- | --- | --- | --- |
+| `net localgroup Administrators` | 2-1 (A) | Windows: 管理者のコマンドプロンプト（またはターミナル (管理者)） | どこでもよい |
+| `wsl --update` / `wsl --install` / `wsl --shutdown` | 2-1 (D) | Windows: 管理者のコマンドプロンプト | どこでもよい |
+| `docker compose version` | 2-1 (E)、2-2、2-3 | 普通のコマンドプロンプト / ターミナル | どこでもよい |
+| `sudo apt …` / `sudo usermod …` | 2-3 | Linux のターミナル | どこでもよい |
+| `cp .env.local.example .env.local` | 3-5 | macOS / Linux のターミナル | **`docker-compose.yml` があるフォルダ** |
+| `docker compose up --build` / `docker compose up` | 4 | 普通のコマンドプロンプト / ターミナル | **`docker-compose.yml` があるフォルダ** |
+| `docker compose down` | 8 | 普通のコマンドプロンプト / ターミナル | **`docker-compose.yml` があるフォルダ** |
+| `ipconfig` / `ipconfig getifaddr en0` / `hostname -I` | 5 | 普通のコマンドプロンプト / ターミナル | どこでもよい |
+
+`docker compose` で始まるコマンドは、どれも **Docker Desktop が起動している（左下が緑 / クジラが Ready）** ときにしか動かない。
+
+---
+
 ## 1. ファイルを手元に置く
 
 Git は使わなくてよい。ブラウザだけで足りる。
@@ -145,8 +272,18 @@ Git は使わなくてよい。ブラウザだけで足りる。
    - Windows: ZIP を右クリック → 「すべて展開」
    - macOS: ZIP をダブルクリック
    - Linux: ファイルマネージャで展開するか `unzip Trilogue1-main.zip`
-5. 展開してできたフォルダを、デスクトップなど分かりやすい場所へ移す
+5. 展開してできた `Trilogue1-main` フォルダを、**デスクトップ** へ移す
+   - この文書のコマンドは、デスクトップに置いた前提で書いてある。別の場所に置いたら、`cd` の行をその場所に読み替える
+   - フォルダの名前は `Trilogue1-main` のまま変えない
 6. フォルダを開いて、**同じ階層に** `README.md` と `docker-compose.yml` があることを確認する
+
+置いたあとの場所は、次のようになる。
+
+| OS | フォルダの場所 |
+| --- | --- |
+| Windows | `C:\Users\自分の名前\Desktop\Trilogue1-main`（OneDrive を使っている PC では `C:\Users\自分の名前\OneDrive\デスクトップ\Trilogue1-main`） |
+| macOS | `/Users/自分の名前/Desktop/Trilogue1-main`（ターミナルでは `~/Desktop/Trilogue1-main`） |
+| Linux | `~/Desktop/Trilogue1-main`（日本語環境では `~/デスクトップ/Trilogue1-main`） |
 
 よくある失敗: 展開すると `Trilogue1-main` の中に、もう一段 `Trilogue1-main` がある。
 作業するのは、`docker-compose.yml` が見える方である。一段深い方にいると、あとでキーが見つからない。
@@ -180,7 +317,7 @@ Git は使わなくてよい。ブラウザだけで足りる。
 | Windows の版 | `Windows + R` → `winver` と打って Enter | Windows 10 または 11 の 64 ビット。ずっと更新していない PC は、先に Windows Update を済ませる |
 | CPU の種類 | 設定 → システム → バージョン情報 → 「システムの種類」 | `x64 ベース プロセッサ` か `ARM ベース プロセッサ` か。ダウンロードする版が変わる |
 | 仮想化が有効か | `Ctrl + Shift + Esc` でタスクマネージャー → パフォーマンス → CPU → 右下の「仮想化」 | **有効** になっていること。無効なら下の「よく止まるところ」を見る |
-| 管理者権限 | スタートボタンを右クリック →「ターミナル (管理者)」で開いたターミナルで `net localgroup Administrators` を実行する | 一覧に自分のユーザー名があること（下の例）。ターミナル (管理者) を開くときにパスワードを求められて分からない場合も、自分では入れられない（研究室PCは管理者に頼む）。設定 → アカウントの名前の下に出る「ローカル アカウント」は、アカウントの種類であって、管理者かどうかとは別 |
+| 管理者権限 | スタートボタンを右クリック →「ターミナル (管理者)」を開き、`net localgroup Administrators` と打って Enter（どのフォルダでもよい） | 一覧に自分のユーザー名があること（下の例）。ターミナル (管理者) を開くときにパスワードを求められて分からない場合も、自分では入れられない（研究室PCは管理者に頼む）。設定 → アカウントの名前の下に出る「ローカル アカウント」は、アカウントの種類であって、管理者かどうかとは別 |
 
 `winver` の窓には、たとえば `Windows 11` の大きな文字と、その下に `バージョン 24H2 (OS ビルド 26100.xxxx)` のような行が出る。
 
@@ -245,7 +382,8 @@ WSL 2 は「Windows の中で Linux を動かす部品」である。Docker は�
 6. 右下の通知領域（時計の左。`^` を押すと隠れているアイコンが出る）にクジラが出ていれば起動している
 7. 窓は閉じてもよい（右上の × で窓を閉じても、裏で動き続ける）
 8. 「WSL needs updating」「WSL 2 installation is incomplete」と出た場合
-   1. スタートメニューで `cmd` と打ち、**コマンドプロンプトを右クリック → 管理者として実行**
+   1. スタートメニューで `cmd` と打ち、**コマンドプロンプトを右クリック → 管理者として実行** →「変更を加えることを許可しますか」で **はい**
+      - 窓の上の題名に「管理者」と出ていれば、管理者で開けている。プロンプトは `C:\Windows\system32>` になる。フォルダの移動はいらない
    2. 次を打って Enter
 
       ```bat
@@ -263,8 +401,10 @@ WSL 2 は「Windows の中で Linux を動かす部品」である。Docker は�
 
 #### (E) 確認する（コマンドプロンプト）
 
-1. スタートメニューで `cmd` と打って、コマンドプロンプトを開く
-2. 次を打って Enter
+1. Docker Desktop の左下が緑（`Engine running`）になっていることを確かめる
+2. スタートメニューで `cmd` と打って、**コマンドプロンプト** を開く（管理者でなくてよい）
+   - 最後の行が `C:\Users\自分の名前>` になっている。このコマンドは **どのフォルダで打ってもよい** ので、移動はいらない
+3. 次を打って Enter
 
 ```bat
 docker compose version
@@ -331,8 +471,10 @@ Docker Compose version v2.39.2-desktop.1
 
 確認（ターミナル）:
 
-1. アプリケーション → ユーティリティ → ターミナル を開く
-2. 次を打って Enter
+1. メニューバー（画面右上）のクジラが Ready になっていることを確かめる
+2. `Command + Space` → `ターミナル` と打って Enter（または Finder → アプリケーション → ユーティリティ → ターミナル）
+   - 最後の行が `自分の名前@Mac の名前 ~ %` になっている。このコマンドは **どのフォルダで打ってもよい** ので、移動はいらない
+3. 次を打って Enter
 
 ```bash
 docker compose version
@@ -358,6 +500,10 @@ Docker Compose version v2.39.2-desktop.1
 
 研究室の Linux 機でサーバーだけ動かす場合。Docker Desktop でもよいが、Engine の方が軽い。
 
+`Ctrl + Alt + T` でターミナルを開き、次を **1行ずつ** 打って Enter する（どのフォルダでもよい）。
+`sudo` の行ではパスワードを聞かれる。打っても画面に何も出ないが、そのまま打って Enter。
+`apt install` の途中で `続行しますか? [Y/n]` と聞かれたら `y` と打って Enter（`-y` を付けているので普通は聞かれない）。
+
 ```bash
 sudo apt update
 sudo apt install -y docker.io docker-compose-v2
@@ -365,6 +511,7 @@ sudo usermod -aG docker "$USER"
 ```
 
 入れたあとは **一度ログアウトして、入り直す**。これをしないと `permission denied` になる。
+入り直したら、もう一度ターミナルを開いて次を打つ。
 
 ```bash
 docker compose version
@@ -537,21 +684,37 @@ OPENAI_MODEL=gpt-4o-mini
 3. そのファイルを複製し、名前を `.env.local` にする
 4. テキストエディットで開く。保存形式は **標準テキスト**（リッチテキストにしない）
 
-ターミナルからやる場合（展開したフォルダにいること）:
+ターミナルからやる場合:
+
+1. ターミナルを開き、`docker-compose.yml` があるフォルダへ移動して、そこにいるか確かめる（節「コマンドの打ち方」）
+
+```bash
+cd ~/Desktop/Trilogue1-main
+ls docker-compose.yml
+```
+
+2. `docker-compose.yml` と出たら、次を1行ずつ打つ。1行目は何も出ずにプロンプトが戻れば成功。2行目でテキストエディットが開く
 
 ```bash
 cp .env.local.example .env.local
 open -e .env.local
 ```
 
+3. 開いたテキストエディットで `OPENAI_API_KEY=` の右にキーを貼り、`Command + S` で保存して閉じる
+
 #### Linux
 
+ターミナルで、`docker-compose.yml` があるフォルダへ移動してから、1行ずつ打つ。
+
 ```bash
+cd ~/Desktop/Trilogue1-main
+ls docker-compose.yml
 cp .env.local.example .env.local
 nano .env.local
 ```
 
-`Ctrl + O` で保存、`Ctrl + X` で閉じる。
+`nano` という編集画面が開く。矢印キーで `OPENAI_API_KEY=` の右へ動かし、`Ctrl + Shift + V` でキーを貼る。
+`Ctrl + O` → Enter で保存、`Ctrl + X` で閉じる。
 
 ---
 
@@ -560,11 +723,15 @@ nano .env.local
 **先に Docker Desktop を起動し、左下が緑（Mac ならクジラが Ready）になるまで待つ。**
 止まっている状態でコマンドを打つと、必ず失敗する。
 
-起動するコマンドはどのOSでも同じ。
+起動するコマンドはどのOSでも同じ。**必ず `docker-compose.yml` があるフォルダで打つ。**
+窓の開き方とフォルダの移動は、この下の OS ごとの手順に書いてある。
 
 ```bash
 docker compose up --build
 ```
+
+`--build` は「サーバーの中身を作り直してから起動する」という意味である。
+初回と、ZIP を新しい版に入れ替えたときは付ける。2回目以降で中身を変えていなければ `docker compose up` だけでも起動する（速い）。
 
 初回はイメージを作るので 3〜10 分かかることがある。大学のWi-Fiが遅いとさらに伸びる。
 途中で `Downloading` や `#1` `#2` のような行が流れるのは正常である。止めない。
@@ -595,10 +762,23 @@ AI の呼び出しに失敗したときは、この窓に英語のログ（`401`
 ### Windows
 
 1. Docker Desktop の左下が緑であることを確認する
-2. `docker-compose.yml` があるフォルダをエクスプローラーで開く
-3. 上のアドレスバーをクリックして、今の文字を消す
-4. `cmd` と打って Enter（そのフォルダでコマンドプロンプトが開く）
-5. 開いた窓に `docker compose up --build` と打って Enter
+2. エクスプローラーで、デスクトップの `Trilogue1-main` を開く（`docker-compose.yml` が見えるフォルダ）
+3. 上のアドレスバーを1回クリックする（文字が青く選ばれる）
+4. そのまま `cmd` と打って Enter。そのフォルダでコマンドプロンプトが開く
+5. 最後の行が `C:\Users\自分の名前\Desktop\Trilogue1-main>` のように、`Trilogue1-main>` で終わっていることを見る
+6. 念のため `dir docker-compose.yml` と打って Enter。`1 個のファイル` と出れば正しい場所にいる
+7. `docker compose up --build` と打って Enter
+8. 上の「最後に次のような行が出れば」の `✓ Ready` が出るまで待つ。**この窓は閉じない**
+
+エクスプローラーを使わずに、開いてあるコマンドプロンプトから移動してもよい。
+
+```bat
+cd /d "%USERPROFILE%\Desktop\Trilogue1-main"
+dir docker-compose.yml
+docker compose up --build
+```
+
+`cd` で「指定されたパスが見つかりません。」と出たら、デスクトップが OneDrive の中にある。節「コマンドの打ち方」の「フォルダを移動する」を見る。
 
 `docker-compose` とハイフンで繋がった古い書き方でも動くことがある。
 `docker` が認識されない、と出たら Docker Desktop が止まっている。緑を確認して、コマンドプロンプトを開き直す。
@@ -606,15 +786,28 @@ AI の呼び出しに失敗したときは、この窓に英語のログ（`401`
 ### macOS
 
 1. メニューバーのクジラが Ready であることを確認する
-2. `docker-compose.yml` があるフォルダを Finder で開く
-3. フォルダを右クリック → 「フォルダに新規ターミナル」（または「サービス」の中）
-   - 出ないときは、ターミナルを開き、`cd `（シーディーとスペース）のあとに、そのフォルダをターミナルへドラッグして Enter
-4. `docker compose up --build` と打って Enter
+2. `Command + Space` → `ターミナル` で、ターミナルを開く
+3. 次を1行ずつ打って Enter
+
+```bash
+cd ~/Desktop/Trilogue1-main
+ls docker-compose.yml
+docker compose up --build
+```
+
+- 1行目のあと、プロンプトが `… Trilogue1-main %` に変わる
+- 2行目で `docker-compose.yml` と出れば正しい場所にいる。`No such file or directory` なら、節「コマンドの打ち方」の「フォルダを移動する」を見る
+- 3行目のあと、`✓ Ready` が出るまで待つ。**この窓は閉じない**
+
+Finder でフォルダを右クリック →「フォルダに新規ターミナル」で開けば、1行目の `cd` は要らない。
 
 ### Linux
 
+ターミナルを開き、次を1行ずつ打って Enter。
+
 ```bash
-cd ~/Desktop/Trilogue1
+cd ~/Desktop/Trilogue1-main
+ls docker-compose.yml
 docker compose up --build
 ```
 
@@ -724,9 +917,9 @@ Gamma: それはとても嬉しい進展ですね！少しでも動きが良く�
 
 | サーバーのOS | IPの確認 | ファイアウォール |
 | --- | --- | --- |
-| Windows | コマンドプロンプトで `ipconfig` → `IPv4 アドレス` | 初回の「セキュリティの重要な警告」で、プライベートネットワークを許可。警告が出ないまま繋がらなければ「Windows セキュリティ → ファイアウォールとネットワーク保護 → 詳細設定 → 受信の規則 → 新しい規則」で、ポート TCP 3000 の接続を許可する |
-| macOS | ターミナルで `ipconfig getifaddr en0`（出なければ `en1`） | 初回の「着信を許可しますか」で許可。出なければ「システム設定 → ネットワーク → ファイアウォール」 |
-| Linux | ターミナルで `hostname -I`（先頭の `192.168.` または `10.`） | `sudo ufw allow 3000/tcp`（ufw を使っている場合） |
+| Windows | サーバーの窓とは **別に** コマンドプロンプトをもう1つ開き（どのフォルダでもよい）、`ipconfig` と打って Enter → `IPv4 アドレス` の行を見る | 初回の「セキュリティの重要な警告」で、プライベートネットワークを許可。警告が出ないまま繋がらなければ「Windows セキュリティ → ファイアウォールとネットワーク保護 → 詳細設定 → 受信の規則 → 新しい規則」で、ポート TCP 3000 の接続を許可する |
+| macOS | サーバーの窓とは別にターミナルを開き（`Command + N` で新しい窓）、`ipconfig getifaddr en0` と打って Enter（出なければ `en1`） | 初回の「着信を許可しますか」で許可。出なければ「システム設定 → ネットワーク → ファイアウォール」 |
+| Linux | 別のターミナルを開き、`hostname -I` と打って Enter（先頭の `192.168.` または `10.` で始まる番号） | `sudo ufw allow 3000/tcp`（ufw を使っている場合） |
 
 Windows の `ipconfig` は、たとえば次のように出る。使うのは、繋いでいる方（Wi-Fi なら `Wireless LAN adapter Wi-Fi`）の `IPv4 アドレス` の行である。
 
@@ -809,12 +1002,18 @@ LabVIEW の前に、必ずブラウザで `/api/lv/agents` を開く。
 
 ## 8. 止める・片付け
 
-起動した窓で `Ctrl + C`（Mac も同じ）。
-完全に止めるときは、同じフォルダでもう一度次を実行する。
+1. サーバーを起動した窓（`✓ Ready` が出ていた窓）をクリックして選ぶ
+2. `Ctrl + C` を押す（Mac も `Ctrl`。`Command` ではない）。数秒でログが止まり、プロンプトが戻ってくる
+   - Windows で「バッチ ジョブを終了しますか (Y/N)?」と聞かれたら `y` と打って Enter
+3. 完全に止めて片付けるときは、**同じ窓（同じフォルダ）で** 次を打って Enter
 
 ```bash
 docker compose down
 ```
+
+`Container trilogue-trilogue-1  Removed` のような行が出て、プロンプトが戻れば終わり。
+
+起動した窓をすでに閉じてしまったときは、新しく窓を開き、`docker-compose.yml` があるフォルダへ移動してから `docker compose down` を打つ（移動のしかたは節4と同じ）。
 
 `.env.local` は消さない。次に使うときにまた必要になる。
 ZIP を消しても、キーだけ残しておけば同じ手順で戻せる。
