@@ -32,6 +32,8 @@
 
 | 日付 | 環境 | 見えていたこと | 原因 | どう抜けたか |
 | --- | --- | --- | --- | --- |
+| 2026-11-04 | N100 ミニPC（Windows 11 Home）、Docker Desktop 4.98.0 | インストーラの最初の画面が、マニュアルの「Use WSL 2 instead of Hyper-V」のチェックではなく、Per-user / All-users の2択になっていた | Docker Desktop の新しい版で画面が変わった | マニュアル節2-1 (C) に新しい画面の選び方を足した |
+| 2026-11-04 | 同上 | 「Recommended」と書かれた Per-user installation で進めたら、`Installation failed. One prerequisite is not fulfilled.`（Virtual Machine Platform が有効でない） | 初めて Docker を入れる PC では、Windows の「仮想マシン プラットフォーム」を有効にする必要があり、それには管理者の権限が要る。Per-user ではできない | インストーラを開き直し、**All-users installation ＋ WSL 2** で入れ直したら成功した。「Recommended」でも、初めての PC では選ばない |
 | 2026-10-28 | Mac（Apple silicon）、大学のネットワーク | 公開リポジトリの ZIP から `docker compose up --build` が通るまで約1分40秒 | 初回はイメージを作るため | 正常。マニュアルに「初回は3〜10分」と書いてある |
 
 まだ Windows 実機での記録が無い。再現試験（`docs/reproduction_test.md`）の結果をここに移す。

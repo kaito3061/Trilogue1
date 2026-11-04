@@ -199,10 +199,15 @@ Git は使わなくてよい。ブラウザだけで足りる。
 
 1. `Docker Desktop Installer.exe` をダブルクリックする
 2. 「このアプリがデバイスに変更を加えることを許可しますか」→ **はい**
-3. Configuration の画面でチェックが2つほど出る
-   - **Use WSL 2 instead of Hyper-V (recommended)** … **チェックを入れたまま**
+3. Configuration の画面で選ぶ。版によって画面が違う
+   - **新しい版**（2026-11 の 4.98.0 で確認）: 上下に2つの選択肢が出る
+     - **All-users installation (Requires password)** を選び、その下は **WSL 2** にする
+     - 上の **Per-user installation (Recommended)** は選ばない。初めて Docker を入れる PC では、
+       Windows の「仮想マシン プラットフォーム」を有効にできず、`Installation failed. One prerequisite is not fulfilled.` で止まる
+     - **Docker VMM (Beta)** は試験中の方式なので選ばない
+   - **古い版**: **Use WSL 2 instead of Hyper-V (recommended)** に **チェックを入れたまま**
    - **Add shortcut to desktop** … どちらでもよい
-4. **OK** を押す。ファイルの展開が数分続く
+4. **OK** を押す。「変更を加えることを許可しますか」→ **はい**。ファイルの展開が数分続く
 5. `Installation succeeded` が出たら **Close and restart**（または Close のあと手動で再起動）
    - **ここで再起動しないと、エンジンが起きない**
 
@@ -255,6 +260,7 @@ docker compose version
 | --- | --- | --- |
 | `docker` は、内部コマンドまたは外部コマンド… | Docker Desktop が止まっているか、入っていない | スタートから Docker Desktop を開き、左下が緑になるまで待つ。そのあとコマンドプロンプトを開き直す |
 | WSL 2 installation is incomplete | Windows の仮想化部品が足りない | インストーラまたは Microsoft の案内どおり WSL2 を入れる。再起動する |
+| `Installation failed. One prerequisite is not fulfilled.`（Virtual Machine Platform が有効でない） | Per-user installation を選んだため、Windows の機能を有効にできなかった | インストーラを開き直し、**All-users installation** を選んでやり直す |
 | Hardware assisted virtualization / Virtualization support not detected | BIOS で仮想化がオフ | 研究室PCなら管理者に頼む。自分のPCなら下の「仮想化を有効にする」 |
 | インストールできない（管理者） | 権限が無い | 自分では進めない。管理者に依頼する |
 | `Engine starting` のまま10分以上 | WSL が古い、または起動に失敗している | Docker Desktop を右下のクジラ → Quit で終了 → (D) の手順8で `wsl --update` → 再起動 |
