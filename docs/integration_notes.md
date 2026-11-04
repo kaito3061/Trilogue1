@@ -48,6 +48,7 @@
 | 2026-08 | 同上 | 昨日まで繋がっていたのに繋がらない | Wi-Fi に繋ぎ直すと、サーバー機の IP が変わることがある | サーバー機で IP を確認し直し、LabVIEW の `Base URL` を書き換えた |
 | 2026-08 | Windows | `ifconfig` が無い | Windows のコマンドは `ipconfig` | `ipconfig` の `IPv4 アドレス` を見た |
 | 2026-08 | 別 PC から接続 | ブラウザで `/api/lv/agents` が開かない | サーバー機のファイアウォールが 3000 番を止めていた | 初回に出る「アクセスを許可しますか」で許可した |
+| 2026-11-04 | サーバー: N100（Windows 11 Home、Docker）、接続元: Mac | N100 自身では `/api/lv/agents` が開くのに、Mac から `curl` すると `Couldn't connect to server` | 許可のダイアログが出ず、ファイアウォールが 3000 番を止めていた | 「セキュリティが強化された Windows Defender ファイアウォール」の受信の規則に、TCP 3000 を許可する規則を手で追加した |
 
 実測: 研究室の Windows 機の LabVIEW → LAN → サーバー機で、3体の往復が約4.7秒（2026-08）。
 
@@ -61,6 +62,7 @@
 | 日付 | 見えていたこと | 原因 | どう抜けたか |
 | --- | --- | --- | --- |
 | 2026-08 | `Unflatten From JSON` で `The cluster element was not found in the JSON` | 受け取り用クラスタに、JSON に無い名前が残っていた。1体用の VI を複製したため `reply` などが残っていた | クラスタを `ok` / `transcript` / `error` の3つだけにした。まず `ok` 1つだけで通るか試すと切り分けやすい |
+| 2026-11-04 | N100（LabVIEW 2026 Q3 Community）で `chat.vi` を実行すると `The VI comes from an untrusted location` | ネットから落とした ZIP の VI は「信頼されていない場所」扱いになる | `View > Manage Trusted Files` で `labview` フォルダを追加した。そのあと `chat.vi` で返事が出た |
 
 
 手順書を書く段階で先回りして入れた注意（実際に起きたかは記録が無い。起きたら上の表に移す）:
@@ -82,6 +84,7 @@
 | 日付 | 場面 | 分かったこと | どうしたか |
 | --- | --- | --- | --- |
 | 2026-11-02 | 新しい Windows 機に LabVIEW を入れる計画を立てたとき、無料版（Community Edition）を使う案が出た | NI の公式ページ「Community Edition Software Usage Details」に、Community Edition は個人・非営利向けで、**大学での研究・授業には使えない** と明記されている。大学の PC や研究には、Academic Volume License などの学術用ライセンスが要る | 無料版は使わず、大学・研究室のライセンスを使う方針にした。マニュアル節0とタワー PC の手順書に注意を書いた |
+| 2026-11-04 | N100 に LabVIEW を入れるとき | 先生から「いったん無料版で進め、あとで研究室のライセンスに書き換える」と指示があった | N100 には Community Edition を入れてアクティブ化した。研究室ライセンスへの切り替えは先生が行う |
 
 ---
 

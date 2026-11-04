@@ -595,6 +595,14 @@ LabVIEW がまだ入っていない PC に入れるときは、ライセンス�
 | AI 1体と往復する | `labview/chat.vi` |
 | 1回送って複数AIに順番に発言させる | `labview/multichat.vi` |
 
+### 「The VI comes from an untrusted location」と出た場合
+
+ネットから落とした ZIP の VI は、新しい LabVIEW では「信頼されていない場所」と判定され、実行が止められる。
+
+1. メニューの `View > Manage Trusted Files` を開く（警告の `Manage Trusted Files` ボタンでも同じ）
+2. `labview` フォルダごと追加する
+3. VI を閉じて開き直し、もう一度実行する
+
 ### 同じPCで LabVIEW を動かす場合
 
 1. 上の VI を開く
@@ -621,7 +629,7 @@ LabVIEW がまだ入っていない PC に入れるときは、ライセンス�
 
 | サーバーのOS | IPの確認 | ファイアウォール |
 | --- | --- | --- |
-| Windows | コマンドプロンプトで `ipconfig` → `IPv4 アドレス` | 初回の「セキュリティの重要な警告」で、プライベートネットワークを許可 |
+| Windows | コマンドプロンプトで `ipconfig` → `IPv4 アドレス` | 初回の「セキュリティの重要な警告」で、プライベートネットワークを許可。警告が出ないまま繋がらなければ「Windows セキュリティ → ファイアウォールとネットワーク保護 → 詳細設定 → 受信の規則 → 新しい規則」で、ポート TCP 3000 の接続を許可する |
 | macOS | ターミナルで `ipconfig getifaddr en0`（出なければ `en1`） | 初回の「着信を許可しますか」で許可。出なければ「システム設定 → ネットワーク → ファイアウォール」 |
 | Linux | ターミナルで `hostname -I`（先頭の `192.168.` または `10.`） | `sudo ufw allow 3000/tcp`（ufw を使っている場合） |
 
